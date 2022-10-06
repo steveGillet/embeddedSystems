@@ -1,0 +1,49 @@
+/*
+ * infrastructure.c
+ *
+ *  Created on: Sep 26, 2022
+ *      Author: root
+ */
+
+#include <mainHead.h>
+
+char aboutOutput[128] = "";
+int timerCallbackCount = 0;
+int messageIndex = 0;
+char newLine[2] = "\r\n";
+int queLen = 8;
+extern Semaphore_Handle semaphore0;
+
+void infra(void){
+    sprintf(aboutOutput, "\r\nSteve Gillet, Assignment 3, v1.431234, %s, %s\r\n", __TIME__, __DATE__); //put outside subroutine
+    strcpy(Glo.var.aboutOutput, aboutOutput);
+    Glo.var.timerCallbackCount = timerCallbackCount;
+    Glo.var.messageIndex = messageIndex;
+    stringCopy(Glo.var.newLine, newLine);
+    Glo.msgQue.readIndex = 0;
+    Glo.msgQue.writeIndex = 0;
+    Glo.var.queLen = queLen;
+    Glo.callbackSem = semaphore0;
+}
+
+void commandServicer(void){
+    while(1){
+        Semaphore_pend(Glo.callbackSem, BIOS_WAIT_FOREVER);
+
+        UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+        UART_write(Glo.uart, Glo.msgQue.messages[Glo.msgQue.readIndex].message, strlen(Glo.msgQue.messages[Glo.msgQue.readIndex].message));
+        commandEntry(Glo.msgQue.messages[Glo.msgQue.readIndex].message);
+        Glo.msgQue.readIndex++;
+        if(Glo.msgQue.readIndex == Glo.var.queLen) Glo.msgQue.readIndex = 0;
+    }
+}
+
+void addMessage(const char *inMessage){
+    stringCopy(Glo.msgQue.messages[Glo.msgQue.writeIndex].message, inMessage);
+    Glo.msgQue.messages[Glo.msgQue.writeIndex].queIndex = Glo.msgQue.writeIndex;
+    Glo.msgQue.messages[Glo.msgQue.writeIndex].msgIndex = strlen(inMessage) - 1;
+    Glo.msgQue.writeIndex++;
+    if(Glo.msgQue.writeIndex == Glo.var.queLen) Glo.msgQue.writeIndex = 0;
+}
+
+

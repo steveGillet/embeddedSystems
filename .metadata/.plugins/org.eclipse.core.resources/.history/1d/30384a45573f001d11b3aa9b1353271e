@@ -1,0 +1,329 @@
+/*
+ * mainHead.h
+ *
+ *  Created on: Sep 18, 2022
+ *      Author: root
+ */
+
+#ifndef MAINHEAD_H_
+#define MAINHEAD_H_
+
+#include <stddef.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+//#include <pthread.h>
+/* BSD support */
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/select.h>
+#include <netdb.h>
+
+#include <ti/net/slnetutils.h>
+#include <ti/drivers/UART.h>
+#include <ti/drivers/GPIO.h>
+#include <ti/drivers/Board.h>
+#include <ti/drivers/Timer.h>
+
+#include <ti/sysbios/BIOS.h>
+#include <ti/sysbios/knl/Semaphore.h>
+
+#define UDPPACKETSIZE 1472
+#define MAXPORTLEN    6
+
+extern void fdOpenSession();
+extern void fdCloseSession();
+extern void *TaskSelf();
+
+#include "ti_drivers_config.h"
+
+
+static char        input;
+static const char echoPrompt[] = "Welcome to MSP432:\r\n";
+
+static const char helpHelpOutput[] = "\r\n-help prints a complete list of supported commands\r\n";
+static const char helpAboutOutput[] = "\r\n-about prints the name, assignment number, version and date/time of compile\r\n";
+static const char helpPrintOutput[] = "\r\n-print prints any text following the command\r\n";
+static const char helpMemrOutput[] = "\r\n-memr shows what is in the memory space specified after the command\r\n\tFlash: 0x00000000 to 0x000FFFFF\r\n\tSRAM: 0x20000000 to 0x2003FFFF\r\n\tPeripherals: 0x40000000 to 0x44055000\r\n";
+static const char helpGPIOOutput[] = "\r\n-gpio allows to you read (-r), toggle (-t), and write (-w) to the GPIO pins.\r\n\tThe first argument is the pin number, second argument is the command type (-t, -w, -r), and the third is 1 or 0 if you are writing high or low\r\n0-3 are LEDs 1-4, 4-5 are the left and right switches, 6 is PK5 and 6 is PD4(*RX)\r\n";
+static const char helpErrorOutput[] = "\r\n-error shows the current count of errors.\r\n";
+
+static const char help[128] = "-help";
+static const char about[128] = "-about";
+static char command[128] = "";
+static char previousCommand[128] = "";
+static char callbackCommand[128] = "";
+static int i = 0;
+static char arrowInput[2] = "";
+// overflow, incorrect command, invalid mem address
+static int errorCount[] = {0, 0, 0};
+static int overflowFlag = 0;
+
+
+static int commandTest(const char *command, const char *compareString){
+    int i;
+    for (i = 0; i < strlen(command); i++){
+        if(compareString[i] != command[i]) return 0;
+    }
+    return 1;
+}
+
+static char *secondString(const char *fullString){
+    char *outString = NULL;
+    int i = 0;
+    for (i = 0; i < strlen(fullString); i++){
+        if(fullString[i] == ' '){
+            outString = &fullString[i + 1];
+            return outString;
+        }
+    }
+    return outString;
+}
+static void stringCopy(char *outString, const char *copiedString){
+    for(i = 0; i < strlen(copiedString); i++){
+        outString[i] = copiedString[i];
+    }
+}
+
+
+/* Callback used for toggling the LED. */
+void timerCallback(Timer_Handle myHandle, int_fast16_t status);
+
+typedef struct variables{
+    char aboutOutput[128];
+    int timerCallbackCount;
+    int messageIndex;
+    char newLine[2];
+    int queLen;
+} Variables;
+
+typedef struct _callbacks{
+    char payload[128];
+    int callbackNumber[3];
+} Callback;
+
+typedef struct _message{
+    char message[128]; //allocate memory
+    int queIndex;
+    int msgIndex;
+} Message;
+
+typedef struct _messageQueue{
+    Message messages[8];
+    int readIndex;
+    int writeIndex;
+} MessageQueue;
+typedef struct _globals {
+    Timer_Handle timer0;
+    UART_Handle uart;
+    Variables var;
+    MessageQueue msgQue;
+    Callback callback;
+    Semaphore_Handle semaphore0;
+} Globals;
+
+#ifndef MAIN
+extern
+#endif
+Globals Glo;
+
+static void addMessage(const char *inMessage){
+    stringCopy(Glo.msgQue.messages[Glo.msgQue.writeIndex].message, inMessage);
+    Glo.msgQue.messages[Glo.msgQue.writeIndex].queIndex = Glo.msgQue.writeIndex;
+    Glo.msgQue.messages[Glo.msgQue.writeIndex].msgIndex = strlen(inMessage) - 1;
+    Glo.msgQue.writeIndex++;
+    if(Glo.msgQue.writeIndex == Glo.var.queLen) Glo.msgQue.writeIndex = 0;
+}
+
+
+static void initializeDrivers(void){
+    Timer_Handle timer0;
+    Timer_Params params;
+    UART_Handle uart;
+    UART_Params uartParams;
+
+    Semaphore_Handle semaphore0;
+    Glo.semaphore0 = semaphore0;
+
+    /* Call driver init functions */
+    Board_init();
+    Timer_init();
+    UART_init();
+    GPIO_init();
+
+//    /* Configure the LED pin */
+//    GPIO_setConfig(CONFIG_GPIO_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
+//
+//    /* Turn off user LED */
+//    GPIO_write(CONFIG_GPIO_0, CONFIG_GPIO_LED_OFF);
+
+    /*
+     * Setting up the timer in continuous callback mode that calls the callback
+     * function every 1,000,000 microseconds, or 1 second.
+     */
+    Timer_Params_init(&params);
+    params.period = 1000000;
+    params.periodUnits = Timer_PERIOD_US;
+    params.timerMode = Timer_CONTINUOUS_CALLBACK;
+    params.timerCallback = timerCallback;
+
+    timer0 = Timer_open(CONFIG_TIMER_0, &params);
+
+    if (timer0 == NULL) {
+        /* Failed to initialized timer */
+        while (1) {}
+    }
+    /* Call driver init functions */
+    if (Timer_start(timer0) == Timer_STATUS_ERROR) {
+        /* Failed to start timer */
+        while (1) {}
+    }
+
+    /* Create a UART with data processing off. */
+    UART_Params_init(&uartParams);
+    uartParams.writeDataMode = UART_DATA_BINARY;
+    uartParams.readDataMode = UART_DATA_BINARY;
+    uartParams.readReturnMode = UART_RETURN_FULL;
+    uartParams.baudRate = 115200;
+
+    uart = UART_open(CONFIG_UART_0, &uartParams);
+
+    if (uart == NULL) {
+        /* UART_open() failed */
+        while (1);
+    }
+    Glo.timer0 = timer0;
+    Glo.uart = uart;
+}
+
+
+static void commandEntry(const char *command) {
+    if(commandTest(help, command)){
+        char *helpCommand;
+        helpCommand = secondString(command);
+
+        if(strstr(helpCommand, "help")) UART_write(Glo.uart, &helpHelpOutput, sizeof(helpHelpOutput));
+        else if(strstr(helpCommand, "about")) UART_write(Glo.uart, &helpAboutOutput, sizeof(helpAboutOutput));
+        else if(strstr(helpCommand, "print")) UART_write(Glo.uart, &helpPrintOutput, sizeof(helpPrintOutput));
+        else if(strstr(helpCommand, "memr")) UART_write(Glo.uart, &helpMemrOutput, sizeof(helpMemrOutput));
+        else if(strstr(helpCommand, "gpio")) UART_write(Glo.uart, &helpGPIOOutput, sizeof(helpGPIOOutput));
+        else if(strstr(helpCommand, "error")) UART_write(Glo.uart, &helpErrorOutput, sizeof(helpErrorOutput));
+        else{
+            UART_write(Glo.uart, &helpHelpOutput, sizeof(helpHelpOutput));
+            UART_write(Glo.uart, &helpAboutOutput, sizeof(helpAboutOutput));
+            UART_write(Glo.uart, &helpPrintOutput, sizeof(helpPrintOutput));
+            UART_write(Glo.uart, &helpMemrOutput, sizeof(helpMemrOutput));
+            UART_write(Glo.uart, &helpGPIOOutput, sizeof(helpGPIOOutput));
+            UART_write(Glo.uart, &helpErrorOutput, sizeof(helpErrorOutput));
+       }
+    }
+    else if(commandTest(about, command)) UART_write(Glo.uart, &Glo.var.aboutOutput, sizeof(Glo.var.aboutOutput));
+    else if(commandTest("-print", command)) {
+        char *print;
+        print = secondString(command);
+        UART_write(Glo.uart, print, strlen(print));
+        UART_write(Glo.uart, Glo.var.newLine, sizeof(Glo.var.newLine));
+    }
+    else if(commandTest("-memr", command)) {
+        char *memoryBuffer;
+        long memoryAddress = 0;
+        long memoryContents = 0;
+        char memoryString[128] = "";
+        char memoryAddressString[128] = "";
+        char *ptr;
+
+        memoryBuffer = secondString(command);
+        memoryAddress = strtol(memoryBuffer, &ptr, 16);
+        if(memoryAddress < 0x00000000 || (memoryAddress > 0x000FFFFF && memoryAddress < 0x20000000) || (memoryAddress > 0x2003FFFF && memoryAddress < 0x40000000) || memoryAddress > 0x44055000){
+            UART_write(Glo.uart, &Glo.var.newLine, strlen(Glo.var.newLine));
+            UART_write(Glo.uart, "Error: Invalid Address", strlen("Error: Invalid Address"));
+            errorCount[2]++;
+        }
+
+        else{
+            memoryAddress = memoryAddress & 0xFFFFFFF0;
+
+            UART_write(Glo.uart, &Glo.var.newLine, sizeof(Glo.var.newLine));
+            for(i = 0xC; i >= 0; i -= 0x4){
+                sprintf(memoryAddressString, "0x%08lx\t\t", memoryAddress + i);
+                UART_write(Glo.uart, &memoryAddressString, strlen(memoryAddressString));
+            }
+            UART_write(Glo.uart, &Glo.var.newLine, sizeof(Glo.var.newLine));
+            for(i = 0xC; i >= 0; i -= 0x4){
+                memoryContents = *(int32_t *) (memoryAddress + i);
+                sprintf(memoryString, "0x%08lx\t\t", memoryContents);
+                UART_write(Glo.uart, &memoryString, strlen(memoryString));
+            }
+        }
+    }
+    else if(commandTest("-gpio", command)) {
+        char *gpioBuffer;
+        char *writeBuffer;
+        char *pinBuffer;
+        int pinNumber = 0;
+        pinBuffer = secondString(command);
+        pinNumber = atoi(pinBuffer);
+        gpioBuffer = secondString(pinBuffer);
+        if(commandTest("-w", gpioBuffer)){
+            writeBuffer = secondString(gpioBuffer);
+            if(commandTest("0", writeBuffer)) GPIO_write(pinNumber, 0);
+            else if(commandTest("1", writeBuffer)) GPIO_write(pinNumber, 1);
+            else GPIO_write(0, 1);
+        }
+        else if(commandTest("-r", gpioBuffer)){
+            UART_write(Glo.uart, &Glo.var.newLine, strlen(Glo.var.newLine));
+            if(GPIO_read(pinNumber)) UART_write(Glo.uart, "1", 1);
+            else UART_write(Glo.uart, "0", 1);
+        }
+        else if(commandTest("-t", gpioBuffer)){
+            GPIO_toggle(pinNumber);
+
+        }
+        else{
+            for (i = 0; i < 8; i++){
+                UART_write(Glo.uart, &Glo.var.newLine, strlen(Glo.var.newLine));
+                if(GPIO_read(i)) UART_write(Glo.uart, "1", 1);
+                else UART_write(Glo.uart, "0", 1);
+            }
+        }
+    }
+    else if(commandTest("-error", command)) {
+        char errorBufferOverflow[128] = "";
+        sprintf(errorBufferOverflow,         "Overflow:          %2d", errorCount[0]);
+        char errorBufferIncorrectCommand[128] = "";
+        sprintf(errorBufferIncorrectCommand, "Incorrect Command: %2d", errorCount[1]);
+        char errorBufferInvalidMemory[128] = "";
+        sprintf(errorBufferInvalidMemory,    "Invalid Memory:    %2d", errorCount[2]);
+        UART_write(Glo.uart, &Glo.var.newLine, strlen(Glo.var.newLine));
+        UART_write(Glo.uart, errorBufferOverflow, strlen(errorBufferOverflow));
+        UART_write(Glo.uart, &Glo.var.newLine, strlen(Glo.var.newLine));
+        UART_write(Glo.uart, errorBufferIncorrectCommand, strlen(errorBufferIncorrectCommand));
+        UART_write(Glo.uart, &Glo.var.newLine, strlen(Glo.var.newLine));
+        UART_write(Glo.uart, errorBufferInvalidMemory, strlen(errorBufferInvalidMemory));
+    }
+    else if(commandTest("-timer", command)) {
+        char *periodBuffer;
+        int period;
+        periodBuffer = secondString(command);
+        period = 10;
+    }
+    else if(commandTest("-callback", command)) {
+        char *callbackBuffer;
+        callbackBuffer = secondString(command);
+        char *numberBuffer;
+        numberBuffer = secondString(callbackBuffer);
+        char *payloadBuffer;
+        payloadBuffer = secondString(numberBuffer);
+
+        Glo.var.timerCallbackCount = atoi(numberBuffer);
+//        strcpy(callbackCommand, payloadBuffer);
+        stringCopy(Glo.callback.payload, payloadBuffer);
+    }
+    else errorCount[1]++;
+    Semaphore_post(semaphore0, BIOS_WAIT_FOREVER);
+}
+
+#endif /* MAINHEAD_H_ */

@@ -1,0 +1,112 @@
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --board "/ti/boards/MSP_EXP432E401Y" --product "simplelink_msp432e4_sdk@4.20.00.12"
+ * @versions {"data":"2020050718","timestamp":"2020050718","tool":"1.5.0+1353","templates":"2020050718"}
+ */
+
+/**
+ * Import the modules used in this configuration.
+ */
+const GPIO    = scripting.addModule("/ti/drivers/GPIO", {}, false);
+const GPIO1   = GPIO.addInstance();
+const GPIO2   = GPIO.addInstance();
+const GPIO3   = GPIO.addInstance();
+const GPIO4   = GPIO.addInstance();
+const GPIO5   = GPIO.addInstance();
+const GPIO6   = GPIO.addInstance();
+const GPIO7   = GPIO.addInstance();
+const GPIO8   = GPIO.addInstance();
+const RTOS    = scripting.addModule("/ti/drivers/RTOS");
+const Timer   = scripting.addModule("/ti/drivers/Timer", {}, false);
+const Timer1  = Timer.addInstance();
+const Timer2  = Timer.addInstance();
+const UART    = scripting.addModule("/ti/drivers/UART", {}, false);
+const UART1   = UART.addInstance();
+const General = scripting.addModule("/ti/ndk/General");
+const NIMU    = scripting.addModule("/ti/ndk/NIMU");
+const NIMU1   = NIMU.addInstance();
+const SlNet   = scripting.addModule("/ti/net/SlNet");
+const SlNet1  = SlNet.addInstance();
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+GPIO1.$name     = "CONFIG_GPIO_0";
+GPIO1.$hardware = system.deviceData.board.components.D1;
+
+GPIO2.$name     = "CONFIG_GPIO_1";
+GPIO2.$hardware = system.deviceData.board.components.D2;
+
+GPIO3.$name     = "CONFIG_GPIO_2";
+GPIO3.$hardware = system.deviceData.board.components.D3;
+
+GPIO4.$name     = "CONFIG_GPIO_3";
+GPIO4.$hardware = system.deviceData.board.components.D4;
+
+GPIO5.$name            = "CONFIG_GPIO_4";
+GPIO5.$hardware        = system.deviceData.board.components.USR_SW1;
+GPIO5.callbackFunction = "leftButtonCallback";
+
+GPIO6.$name            = "CONFIG_GPIO_5";
+GPIO6.$hardware        = system.deviceData.board.components.USR_SW2;
+GPIO6.callbackFunction = "rightButtonCallback";
+
+GPIO7.$name           = "CONFIG_GPIO_6";
+GPIO7.mode            = "Output";
+GPIO7.gpioPin.$assign = "boosterpack2.38";
+
+GPIO8.$name           = "CONFIG_GPIO_7";
+GPIO8.mode            = "Output";
+GPIO8.gpioPin.$assign = "expansion.40";
+
+
+Timer1.$name             = "CONFIG_TIMER_0";
+Timer1.timerType         = "32 Bits";
+Timer1.interruptPriority = "4";
+
+Timer2.$name             = "CONFIG_TIMER_1";
+Timer2.interruptPriority = "3";
+Timer2.timerType         = "32 Bits";
+
+UART1.$name     = "CONFIG_UART_0";
+UART1.$hardware = system.deviceData.board.components.XDS110UART;
+
+General.ndkThreadStkSize      = 2048;
+General.lowPriTaskDefStkSize  = 2048;
+General.normPriTaskDefStkSize = 2048;
+General.highPriTaskDefStkSize = 2048;
+General.networkIPAddrHook     = "netIPAddrHook";
+General.tcpTxBufSize          = 1024;
+General.tcpRxBufSize          = 1024;
+General.tcpRxBufLimit         = 2048;
+General.udpRxBufSize          = 2048;
+
+NIMU1.$name              = "CONFIG_NIMU_0";
+NIMU1.dhcpcServReportFxn = "serviceReport";
+NIMU1.emac.$name         = "CONFIG_EMAC_0";
+
+SlNet1.$name             = "CONFIG_SLNET_0";
+SlNet1.id                = 2;
+SlNet1.enableSecureSocks = false;
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+GPIO1.gpioPin.$suggestSolution           = "expansion.87";
+GPIO2.gpioPin.$suggestSolution           = "expansion.85";
+GPIO3.gpioPin.$suggestSolution           = "expansion.64";
+GPIO4.gpioPin.$suggestSolution           = "expansion.66";
+GPIO5.gpioPin.$suggestSolution           = "expansion.82";
+GPIO6.gpioPin.$suggestSolution           = "expansion.84";
+RTOS.timer0.resource.$suggestSolution    = "Timer0";
+Timer1.timer.$suggestSolution            = "Timer2";
+Timer2.timer.$suggestSolution            = "Timer1";
+UART1.uart.$suggestSolution              = "UART0";
+UART1.uart.txPin.$suggestSolution        = "expansion.76";
+UART1.uart.rxPin.$suggestSolution        = "expansion.74";
+NIMU1.emac.emac.$suggestSolution         = "ETHERNET0";
+NIMU1.emac.emac.led0Pin.$suggestSolution = "boosterpack2.39";
+NIMU1.emac.emac.led1Pin.$suggestSolution = "boosterpack2.32";

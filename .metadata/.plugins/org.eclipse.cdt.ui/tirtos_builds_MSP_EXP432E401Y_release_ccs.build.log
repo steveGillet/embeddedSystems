@@ -1,0 +1,12 @@
+
+**** Build of configuration Debug for project tirtos_builds_MSP_EXP432E401Y_release_ccs ****
+
+/home/steve0gillet/ti/ccs1200/ccs/utils/bin/gmake -k -j 12 all -O 
+ 
+making ../src/sysbios/sysbios.aem4f ...
+gmake[1]: Nothing to be done for 'all'.
+gmake[1]: Nothing to be done for 'configPkg/linker.cmd'.
+making ../src/sysbios/sysbios.aem4f ...
+gmake[2]: Nothing to be done for 'all'.
+
+**** Build Finished ****

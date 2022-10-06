@@ -1,0 +1,38 @@
+
+**** Build of configuration Debug for project workingUartEchoNortos ****
+
+/home/steve0gillet/ti/ccs1200/ccs/utils/bin/gmake -k -j 12 all -O 
+ 
+Building target: "workingUartEchoNortos.out"
+Invoking: Arm Linker
+"/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --advice:power=none -g --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on -z -m"workingUartEchoNortos.map" -i"/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source" -i"/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/kernel/nortos" -i"/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.6.LTS/lib" --diag_suppress=10063 --diag_wrap=off --display_error_number --warn_sections --xml_link_info="workingUartEchoNortos_linkInfo.xml" --entry_point=resetISR --rom_model -o "workingUartEchoNortos.out" "./main_nortos.obj" "../main_nortos.obj" "./ti_drivers_config.obj" "../ti_drivers_config.obj" "./uartecho.obj" "../uartecho.obj" "./syscfg/ti_drivers_config.obj" "../MSP_EXP432E401Y_NoRTOS.cmd"  -l"ti/display/lib/display.aem4f" -l"ti/grlib/lib/ccs/m4f/grlib.a" -l"third_party/spiffs/lib/ccs/m4f/spiffs.a" -l"ti/drivers/lib/drivers_msp432e4.aem4f" -l"third_party/fatfs/lib/ccs/m4f/fatfs.a" -l"lib/nortos_msp432e4.aem4f" -l"ti/devices/msp432e4/driverlib/lib/ccs/m4f/msp432e4_driverlib.a" -llibc.a 
+<Linking>
+error #10056: symbol "main" redefined: first defined in "./main_nortos.obj"; redefined in "../main_nortos.obj"
+error #10056: symbol "gpioCallbackFunctions" redefined: first defined in "./ti_drivers_config.obj"; redefined in "../ti_drivers_config.obj"
+error #10056: symbol "CONFIG_UART_0_CONST" redefined: first defined in "./ti_drivers_config.obj"; redefined in "../ti_drivers_config.obj"
+error #10056: symbol "UART_count" redefined: first defined in "./ti_drivers_config.obj"; redefined in "../ti_drivers_config.obj"
+error #10056: symbol "Board_init" redefined: first defined in "./ti_drivers_config.obj"; redefined in "../ti_drivers_config.obj"
+error #10056: symbol "CONFIG_GPIO_LED_0_CONST" redefined: first defined in "./ti_drivers_config.obj"; redefined in "../ti_drivers_config.obj"
+error #10056: symbol "gpioPinConfigs" redefined: first defined in "./ti_drivers_config.obj"; redefined in "../ti_drivers_config.obj"
+error #10056: symbol "UART_config" redefined: first defined in "./ti_drivers_config.obj"; redefined in "../ti_drivers_config.obj"
+error #10056: symbol "GPIOMSP432E4_config" redefined: first defined in "./ti_drivers_config.obj"; redefined in "../ti_drivers_config.obj"
+error #10056: symbol "PowerMSP432E4_config" redefined: first defined in "./ti_drivers_config.obj"; redefined in "../ti_drivers_config.obj"
+error #10056: symbol "mainThread" redefined: first defined in "./uartecho.obj"; redefined in "../uartecho.obj"
+error #10056: symbol "gpioCallbackFunctions" redefined: first defined in "./ti_drivers_config.obj"; redefined in "./syscfg/ti_drivers_config.obj"
+error #10056: symbol "CONFIG_UART_0_CONST" redefined: first defined in "./ti_drivers_config.obj"; redefined in "./syscfg/ti_drivers_config.obj"
+error #10056: symbol "UART_count" redefined: first defined in "./ti_drivers_config.obj"; redefined in "./syscfg/ti_drivers_config.obj"
+error #10056: symbol "Board_init" redefined: first defined in "./ti_drivers_config.obj"; redefined in "./syscfg/ti_drivers_config.obj"
+error #10056: symbol "CONFIG_GPIO_LED_0_CONST" redefined: first defined in "./ti_drivers_config.obj"; redefined in "./syscfg/ti_drivers_config.obj"
+error #10056: symbol "gpioPinConfigs" redefined: first defined in "./ti_drivers_config.obj"; redefined in "./syscfg/ti_drivers_config.obj"
+error #10056: symbol "UART_config" redefined: first defined in "./ti_drivers_config.obj"; redefined in "./syscfg/ti_drivers_config.obj"
+error #10056: symbol "GPIOMSP432E4_config" redefined: first defined in "./ti_drivers_config.obj"; redefined in "./syscfg/ti_drivers_config.obj"
+error #10056: symbol "PowerMSP432E4_config" redefined: first defined in "./ti_drivers_config.obj"; redefined in "./syscfg/ti_drivers_config.obj"
+error #10010: errors encountered during linking; "workingUartEchoNortos.out" not built
+ 
+>> Compilation failure
+makefile:152: recipe for target 'workingUartEchoNortos.out' failed
+gmake[1]: *** [workingUartEchoNortos.out] Error 1
+gmake: *** [all] Error 2
+makefile:148: recipe for target 'all' failed
+
+**** Build Finished ****

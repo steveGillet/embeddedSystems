@@ -1,0 +1,86 @@
+/*
+ * Glo.uartEcho.c
+ *
+ *  Created on: Sep 17, 2022
+ *      Author: root
+ */
+
+#include "mainHead.h"
+
+void *uartEcho(void *arg0)
+{
+
+    UART_write(Glo.uart, echoPrompt, sizeof(echoPrompt));
+
+    /* Loop forever echoing */
+    while (1) {
+        arrowInput[0] = 0;
+        UART_read(Glo.uart, &input, 1);
+        if(input == '\33') {
+            UART_read(Glo.uart, &arrowInput, 2);
+            if(commandTest("[A", arrowInput)){
+                UART_write(Glo.uart, "\r", strlen("\r"));
+                UART_write(Glo.uart, "                                    ", strlen("                                    "));
+                UART_write(Glo.uart, "\r", strlen("\r"));
+                UART_write(Glo.uart, &previousCommand, strlen(previousCommand));
+                strcpy(command, previousCommand);
+                i = strlen(command);
+                continue;
+            }
+            else{
+                UART_write(Glo.uart, &input, 1);
+                UART_write(Glo.uart, &arrowInput, 2);
+            }
+        }
+        if(i < 127){
+            UART_write(Glo.uart, &input, 1);
+        }
+
+        if(input == '\r') {
+            addMessage(command);
+            Semaphore_post(Glo.semaphore0);
+
+            strcpy(previousCommand, command);
+            memset(command,0,sizeof(command));
+            i=0;
+            UART_write(Glo.uart, &Glo.var.newLine, sizeof(Glo.var.newLine));
+            overflowFlag = 0;
+        }
+        else if (input == '\b' && i > 0){
+            i--;
+            command[i] = 0;
+            UART_write(Glo.uart, " \b", strlen(" \b"));
+        }
+        else if (i < 127) {
+            command[i] = input;
+            i++;
+        }
+        if (i == 127 && overflowFlag == 0) {
+            overflowFlag = 1;
+            errorCount[0]++;
+        }
+    }
+}
+
+void timerCallback(Timer_Handle myHandle, int_fast16_t status)
+{
+    if(Glo.var.timerCallbackCount != 0){
+        addMessage(Glo.callback.payload);
+        if(Glo.var.timerCallbackCount>0){
+            Glo.var.timerCallbackCount--;
+        }
+    }
+}
+
+/*
+ *  ======== mainThread ========
+ */
+
+/*
+ * This callback is called every 1,000,000 microseconds, or 1 second. Because
+ * the LED is toggled each time this function is called, the LED will blink at
+ * a rate of once every 2 seconds.
+ */
+
+
+

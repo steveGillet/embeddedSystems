@@ -1,0 +1,27 @@
+
+**** Build of configuration Debug for project timerled_MSP_EXP432E401Y_tirtos_ccs ****
+
+/home/steve0gillet/ti/ccs1200/ccs/utils/bin/gmake -k -j 12 all -O 
+ 
+Building target: "timerled_MSP_EXP432E401Y_tirtos_ccs.out"
+Invoking: Arm Linker
+"/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --advice:power=none -g --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on -z -m"timerled_MSP_EXP432E401Y_tirtos_ccs.map" -i"/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source" -i"/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/kernel/tirtos/packages" -i"/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" --diag_wrap=off --display_error_number --warn_sections --xml_link_info="timerled_MSP_EXP432E401Y_tirtos_ccs_linkInfo.xml" --rom_model -o "timerled_MSP_EXP432E401Y_tirtos_ccs.out" "./main_tirtos.obj" "./timerled.obj" "./syscfg/ti_drivers_config.obj" "../MSP_EXP432E401Y_TIRTOS.cmd" -l"ti/display/lib/display.aem4f" -l"ti/grlib/lib/ccs/m4f/grlib.a" -l"third_party/spiffs/lib/ccs/m4f/spiffs.a" -l"ti/drivers/lib/drivers_msp432e4.aem4f" -l"third_party/fatfs/lib/ccs/m4f/fatfs.a" -l"ti/dpl/lib/dpl_msp432e4.aem4f" -l"/home/steve0gillet/workspace_v12/tirtos_builds_MSP_EXP432E401Y_release_ccs/Debug/configPkg/linker.cmd"  -l"ti/devices/msp432e4/driverlib/lib/ccs/m4f/msp432e4_driverlib.a" -llibc.a 
+<Linking>
+warning #10229-D: output section ".data" refers to load symbol "uartEcho" and hence cannot be compressed; compression "lzss" is ignored
+ 
+ undefined       first referenced                                                                                                          
+  symbol             in file                                                                                                               
+ ---------       ----------------                                                                                                          
+ commandServicer /home/steve0gillet/workspace_v12/tirtos_builds_MSP_EXP432E401Y_release_ccs/Debug/configPkg/package/cfg/release_pem4f.oem4f
+ uartEcho        /home/steve0gillet/workspace_v12/tirtos_builds_MSP_EXP432E401Y_release_ccs/Debug/configPkg/package/cfg/release_pem4f.oem4f
+ 
+error #10234-D: unresolved symbols remain
+error #10010: errors encountered during linking; "timerled_MSP_EXP432E401Y_tirtos_ccs.out" not built
+ 
+>> Compilation failure
+makefile:151: recipe for target 'timerled_MSP_EXP432E401Y_tirtos_ccs.out' failed
+gmake[1]: *** [timerled_MSP_EXP432E401Y_tirtos_ccs.out] Error 1
+gmake: *** [all] Error 2
+makefile:144: recipe for target 'all' failed
+
+**** Build Finished ****
