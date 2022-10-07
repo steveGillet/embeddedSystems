@@ -17,7 +17,7 @@ int queLen = 8;
 extern Semaphore_Handle semaphore0;
 
 char        input;
-const char echoPrompt[] = "Welcome to MSP432:\r\n";
+const char echoPrompt[] = "\r\nWelcome to MSP432:\r\n";
 
 const char helpHelpOutput[] = "\r\n-help prints a complete list of supported commands\r\n";
 const char helpAboutOutput[] = "\r\n-about prints the name, assignment number, version and date/time of compile\r\n";
@@ -128,6 +128,10 @@ void infra(void){
         Glo.ticker.period[i] = 0;
         Glo.ticker.delay[i] = 0;
         Glo.ticker.tickerCount[i] = 0;
+    }
+
+    for(i = 0; i < REGISTERNUM; i++){
+        Glo.reg[i] = i * 10;
     }
 }
 
@@ -256,7 +260,7 @@ void commandEntry(char *command) {
         int period;
         periodBuffer = secondString(command);
         period = atoi(periodBuffer);
-        if(period > 100){
+        if(period > 100) {
             Glo.callback.period = period;
             Timer_setPeriod(Glo.timer0, Timer_PERIOD_US, Glo.callback.period);
         }
@@ -280,8 +284,28 @@ void commandEntry(char *command) {
         char *payloadBuffer;
         payloadBuffer = secondString(numberBuffer);
 
-        Glo.callback.callbackNumber[atoi(callbackBuffer)] = atoi(numberBuffer);
-        strcpy(Glo.callback.payload[atoi(callbackBuffer)], payloadBuffer);
+        if(!callbackBuffer){
+            UART_write(Glo.uart, "\r\nCallback 0 (Timer)       :\t", strlen("\r\nCallback 0 (Timer)       :\t"));
+            UART_write(Glo.uart, Glo.callback.payload[0], strlen(Glo.callback.payload[0]));
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+            UART_write(Glo.uart, "\r\nCallback 1 (Left Button) :\t", strlen("\r\nCallback 1 (Left Button) :\t"));
+            UART_write(Glo.uart, Glo.callback.payload[1], strlen(Glo.callback.payload[1]));
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+            UART_write(Glo.uart, "\r\nCallback 2 (Right Button):\t", strlen("\r\nCallback 2 (Right Button):\t"));
+            UART_write(Glo.uart, Glo.callback.payload[2], strlen(Glo.callback.payload[2]));
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+        }
+        else if(!numberBuffer){
+            if(atoi(callbackBuffer) == 0) UART_write(Glo.uart, "\r\nCallback 0 (Timer)       :\t", strlen("\r\nCallback 0 (Timer)       :\t"));
+            else if(atoi(callbackBuffer) == 1) UART_write(Glo.uart, "\r\nCallback 1 (Left Button)       :\t", strlen("\r\nCallback 1 (Left Button)       :\t"));
+            else UART_write(Glo.uart, "\r\nCallback 2 (Right Button)       :\t", strlen("\r\nCallback 2 (Right Button)       :\t"));
+            UART_write(Glo.uart, Glo.callback.payload[atoi(callbackBuffer)], strlen(Glo.callback.payload[atoi(callbackBuffer)]));
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+        }
+        else{
+            Glo.callback.callbackNumber[atoi(callbackBuffer)] = atoi(numberBuffer);
+            strcpy(Glo.callback.payload[atoi(callbackBuffer)], payloadBuffer);
+        }
     }
     else if(commandTest("-ticker", command)) {
         char *tickerIndexBuffer;
@@ -295,13 +319,82 @@ void commandEntry(char *command) {
         char *payloadBuffer;
         payloadBuffer = secondString(tickerCountBuffer);
 
-        Glo.ticker.delay[atoi(tickerIndexBuffer)] = atoi(tickerDelayBuffer);
+        if(!tickerIndexBuffer){
+            int i = 0;
+            for(i = 0; i < TICKERNUM; i++){
+                char tickerOutputBuffer[48];
+                sprintf(tickerOutputBuffer, "\r\nTicker %2d :\t", i);
+                UART_write(Glo.uart, tickerOutputBuffer, strlen(tickerOutputBuffer));
+                UART_write(Glo.uart, Glo.ticker.payload[i], strlen(Glo.ticker.payload[i]));
+            }
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+        }
+        else if(!tickerDelayBuffer){
+            char tickerOutputBuffer[48];
+            sprintf(tickerOutputBuffer, "\r\nTicker %2d :\t", atoi(tickerIndexBuffer));
+            UART_write(Glo.uart, tickerOutputBuffer, strlen(tickerOutputBuffer));
+            UART_write(Glo.uart, Glo.ticker.payload[atoi(tickerIndexBuffer)], strlen(Glo.ticker.payload[atoi(tickerIndexBuffer)]));
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+        }
+        else{
+            Glo.ticker.delay[atoi(tickerIndexBuffer)] = atoi(tickerDelayBuffer);
 
-        Glo.ticker.period[atoi(tickerIndexBuffer)] = atoi(tickerPeriodBuffer);
+            Glo.ticker.period[atoi(tickerIndexBuffer)] = atoi(tickerPeriodBuffer);
 
-        Glo.ticker.tickerCount[atoi(tickerIndexBuffer)] = atoi(tickerCountBuffer);
+            Glo.ticker.tickerCount[atoi(tickerIndexBuffer)] = atoi(tickerCountBuffer);
 
-        strcpy(Glo.ticker.payload[atoi(tickerIndexBuffer)], payloadBuffer);
+            strcpy(Glo.ticker.payload[atoi(tickerIndexBuffer)], payloadBuffer);
+        }
+    }
+    else if(commandTest("-reg", command)) {
+        char *regInBuffer;
+        regInBuffer = secondString(command);
+        char *regOperatorBuffer;
+        regOperatorBuffer = secondString(regInBuffer);
+        char *regOperandBuffer1;
+        regOperandBuffer1 = secondString(regOperatorBuffer);
+        char *regOperandBuffer2;
+        regOperandBuffer2 = secondString(regOperandBuffer1);
+        int i;
+
+        if(!regInBuffer){
+            for(i = 0; i < REGISTERNUM; i++){
+                char regOutputBuffer[48];
+                sprintf(regOutputBuffer, "\r\nRegister %2d :\t%4d", i, Glo.reg[i]);
+                UART_write(Glo.uart, regOutputBuffer, strlen(regOutputBuffer));
+            }
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+        }
+        else if(!regOperatorBuffer){
+            char regOutputBuffer[48];
+            sprintf(regOutputBuffer, "\r\nRegister %2d :\t%4d", atoi(regInBuffer), Glo.reg[atoi(regInBuffer)]);
+            UART_write(Glo.uart, regOutputBuffer, strlen(regOutputBuffer));
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+        }
+        else if(commandTest("=", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = atoi(regOperandBuffer1);
+        else if(commandTest("++", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)] = Glo.reg[atoi(regOperandBuffer1)] + 1;
+        else if(commandTest("--", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)] = Glo.reg[atoi(regOperandBuffer1)] - 1;
+        else if(commandTest("+", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = Glo.reg[atoi(regOperandBuffer1)] + Glo.reg[atoi(regOperandBuffer2)];
+        else if(commandTest("-", regOperatorBuffer)){
+            if(!regOperandBuffer2) Glo.reg[atoi(regInBuffer)] = -Glo.reg[atoi(regOperandBuffer1)];
+            else Glo.reg[atoi(regInBuffer)] = Glo.reg[atoi(regOperandBuffer1)] - Glo.reg[atoi(regOperandBuffer2)];
+        }
+        else if(commandTest("~", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = ~Glo.reg[atoi(regOperandBuffer1)];
+        else if(commandTest("&", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = Glo.reg[atoi(regOperandBuffer1)] & Glo.reg[atoi(regOperandBuffer2)];
+        else if(commandTest("|", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = Glo.reg[atoi(regOperandBuffer1)] | Glo.reg[atoi(regOperandBuffer2)];
+        else if(commandTest("^", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = Glo.reg[atoi(regOperandBuffer1)] ^ Glo.reg[atoi(regOperandBuffer2)];
+        else if(commandTest("*", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = Glo.reg[atoi(regOperandBuffer1)] * Glo.reg[atoi(regOperandBuffer2)];
+        else if(commandTest("/", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = Glo.reg[atoi(regOperandBuffer1)] / Glo.reg[atoi(regOperandBuffer2)];
+        else if(commandTest("%", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = Glo.reg[atoi(regOperandBuffer1)] % Glo.reg[atoi(regOperandBuffer2)];
+        else if(commandTest(">", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = (Glo.reg[atoi(regOperandBuffer1)] > Glo.reg[atoi(regOperandBuffer2)]) ? Glo.reg[atoi(regOperandBuffer1)] : Glo.reg[atoi(regOperandBuffer2)];
+        else if(commandTest("<", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = (Glo.reg[atoi(regOperandBuffer1)] < Glo.reg[atoi(regOperandBuffer2)]) ? Glo.reg[atoi(regOperandBuffer1)] : Glo.reg[atoi(regOperandBuffer2)];
+        else if(commandTest("c", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = Glo.reg[atoi(regOperandBuffer1)];
+        else if(commandTest("x", regOperatorBuffer)){
+            int32_t tempReg;
+            tempReg = Glo.reg[atoi(regInBuffer)];
+            Glo.reg[atoi(regInBuffer)]  = Glo.reg[atoi(regOperandBuffer1)];
+            Glo.reg[atoi(regOperandBuffer1)] = tempReg;
+        }
     }
     else errorCount[1]++;
 }
@@ -328,16 +421,7 @@ void initializeDrivers(void){
     GPIO_enableInt(4);
     GPIO_enableInt(5);
 
-//    /* Configure the LED pin */
-//    GPIO_setConfig(CONFIG_GPIO_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
-//
-//    /* Turn off user LED */
-//    GPIO_write(CONFIG_GPIO_0, CONFIG_GPIO_LED_OFF);
 
-    /*
-     * Setting up the timer in continuous callback mode that calls the callback
-     * function every 1,000,000 microseconds, or 1 second.
-     */
     Timer_Params_init(&params);
     params.period = Glo.callback.period;
     params.periodUnits = Timer_PERIOD_US;

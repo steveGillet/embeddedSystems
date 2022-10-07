@@ -8,23 +8,16 @@
 #ifndef MAINHEAD_H_
 #define MAINHEAD_H_
 
-#define TICKERNUM 16
+#define TICKERNUM   16
+#define REGISTERNUM 32
 
 #include <stddef.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-//#include <pthread.h>
-/* BSD support */
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <netdb.h>
-
-#include <ti/net/slnetutils.h>
 #include <ti/drivers/UART.h>
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/Board.h>
@@ -32,13 +25,6 @@
 
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Semaphore.h>
-
-#define UDPPACKETSIZE 1472
-#define MAXPORTLEN    6
-
-extern void fdOpenSession();
-extern void fdCloseSession();
-extern void *TaskSelf();
 
 #include "ti_drivers_config.h"
 
@@ -106,6 +92,7 @@ typedef struct _globals {
     Callback callback;
     Ticker ticker;
     Semaphore_Handle msgQueSem;
+    int32_t reg[REGISTERNUM];
 } Globals;
 
 #ifndef MAIN

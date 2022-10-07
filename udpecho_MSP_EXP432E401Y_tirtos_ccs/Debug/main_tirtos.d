@@ -75,26 +75,7 @@ main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.
 main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/xlocale/_string.h
 main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdio.h
 main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/netinet/in.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/slnetsock.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/posix/ccs/sys/time.h
-main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_timeval.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/arpa/inet.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/slnetutils.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/sys/socket.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/posix/ccs/sys/types.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/posix/ccs/sys/_internal.h
-main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/time.h
-main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/abi_prefix.h
-main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/xlocale/_time.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/errnoutil.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/sys/select.h
-main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/select.h
-main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_sigset.h
-main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/timespec.h
-main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_timespec.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/netdb.h
-main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/slneterr.h
+main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h
 main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/UART.h
 main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/GPIO.h
 main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/Timer.h
@@ -352,45 +333,7 @@ main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source
 
 /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h:
 
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/netinet/in.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/slnetsock.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/posix/ccs/sys/time.h:
-
-/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_timeval.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/arpa/inet.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/slnetutils.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/sys/socket.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/posix/ccs/sys/types.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/posix/ccs/sys/_internal.h:
-
-/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/time.h:
-
-/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/abi_prefix.h:
-
-/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/xlocale/_time.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/errnoutil.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/sys/select.h:
-
-/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/select.h:
-
-/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_sigset.h:
-
-/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/timespec.h:
-
-/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_timespec.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/bsd/netdb.h:
-
-/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/net/slneterr.h:
+/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h:
 
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/UART.h:
 

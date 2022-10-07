@@ -35,9 +35,7 @@
  *    Contains BSD sockets code.
  */
 
-#include <string.h>
-#include <stdint.h>
-#include <stdio.h>
+#include <mainHead.h>
 
 #include <pthread.h>
 /* BSD support */
@@ -55,7 +53,6 @@
 extern void fdOpenSession();
 extern void fdCloseSession();
 extern void *TaskSelf();
-
 /*
  *  ======== echoFxn ========
  *  Echoes UDP messages.
@@ -77,7 +74,7 @@ void *echoFxn(void *arg0)
 
     fdOpenSession(TaskSelf());
 
-//    Display_printf(display, 0, 0, "UDP Echo example started\n");
+    UART_write(Glo.uart, "\r\nUDP Echo example starter\r\n", strlen("\r\nUDP Echo example started\r\n"));
 
     sprintf(portNumber, "%d", *(uint16_t *)arg0);
 
@@ -89,8 +86,9 @@ void *echoFxn(void *arg0)
     /* Obtain addresses suitable for binding to */
     status = getaddrinfo(NULL, portNumber, &hints, &res);
     if (status != 0) {
-//        Display_printf(display, 0, 0, "Error: getaddrinfo() failed: %s\n",
-//            gai_strerror(status));
+        char gaiErrorBuffer[50];
+        sprintf(gaiErrorBuffer, "\r\nError: getaddrinfo() failed: %s\r\n", gai_strerror(status));
+        UART_write(Glo.uart, gaiErrorBuffer, strlen(gaiErrorBuffer));
         goto shutdown;
     }
 
@@ -109,10 +107,10 @@ void *echoFxn(void *arg0)
     }
 
     if (server == -1) {
-//        Display_printf(display, 0, 0, "Error: socket not created.\n");
+        UART_write(Glo.uart, "\r\nError: socket not created.\r\n", strlen("\r\nError: socket not created.\r\n"));
         goto shutdown;
     } else if (p == NULL) {
-//        Display_printf(display, 0, 0, "Error: bind failed.\n");
+        UART_write(Glo.uart, "\r\nError: bind failed.\r\n", strlen("\r\nError: bind failed.\r\n"));
         goto shutdown;
     } else {
         freeaddrinfo(res);
@@ -139,8 +137,7 @@ void *echoFxn(void *arg0)
                     bytesSent = sendto(server, buffer, bytesRcvd, 0,
                             (struct sockaddr *)&clientAddr, addrlen);
                     if (bytesSent < 0 || bytesSent != bytesRcvd) {
-//                        Display_printf(display, 0, 0,
-//                                "Error: sendto failed.\n");
+                        UART_write(Glo.uart, "\r\nError: sendto failed.\r\n", strlen("\r\nError: sendto failed.\r\n"));
                         goto shutdown;
                     }
                 }
