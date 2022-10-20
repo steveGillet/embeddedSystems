@@ -10,6 +10,8 @@
 
 #define TICKERNUM   16
 #define REGISTERNUM 32
+#define SCRIPTNUM 32
+#define QUELEN 16
 
 #include <stddef.h>
 #include <string.h>
@@ -32,7 +34,6 @@ typedef struct variables{
     char *aboutOutput;
     int messageIndex;
     char *newLine;
-    int queLen;
     char        input;
     const char *echoPrompt;
 
@@ -45,6 +46,9 @@ typedef struct variables{
     const char *helpTimerOutput;
     const char *helpCallbackOutput;
     const char *helpTickerOutput;
+    const char *helpRegOutput;
+    const char *helpScriptOutput;
+    const char *helpIfOutput;
 
     const char *help;
     const char *about;
@@ -59,29 +63,31 @@ typedef struct variables{
 } Variables;
 
 typedef struct _callbacks{
-    char *payload[3];
-    int callbackNumber[3];
+    char payload[128];
+    int callbackCount;
     int period;
 } Callback;
 
 typedef struct _tickers{
-    char *payload[TICKERNUM];
-    int tickerCount[TICKERNUM];
-    int delay[TICKERNUM];
-    int period[TICKERNUM];
+    char payload[128];
+    int tickerCount;
+    int delay;
+    int period;
 } Ticker;
 
 typedef struct _message{
     char message[128]; //allocate memory
-    int queIndex;
-    int msgIndex;
 } Message;
 
 typedef struct _messageQueue{
-    Message messages[8];
+    Message messages[QUELEN];
     int readIndex;
     int writeIndex;
 } MessageQueue;
+
+typedef struct _script{
+    char payload[128];
+} Script;
 
 typedef struct _globals {
     Timer_Handle timer0;
@@ -89,10 +95,11 @@ typedef struct _globals {
     UART_Handle uart;
     Variables var;
     MessageQueue msgQue;
-    Callback callback;
-    Ticker ticker;
+    Callback callback[3];
+    Ticker ticker[TICKERNUM];
     Semaphore_Handle msgQueSem;
     int32_t reg[REGISTERNUM];
+    Script script[SCRIPTNUM];
 } Globals;
 
 #ifndef MAIN
@@ -103,15 +110,16 @@ Globals Glo;
 void timerCallback(Timer_Handle myHandle, int_fast16_t status);
 void tickerCallback(Timer_Handle myHandle, int_fast16_t status);
 
-void commandEntry(char *command);
-void initializeDrivers(void);
-void stringCopy(char *outString, const char *copiedString);
-char *secondString(char *fullString);
-int commandTest(const char *command, const char *compareString);
 void addMessage(const char *inMessage);
-void commandServicer(void);
+void commandEntry(char *command);
+int commandTest(const char *command, const char *compareString);
+int indexOf(const char *string, const char character);
 void infra(void);
+void initializeDrivers(void);
 void leftButtonCallback(void);
 void rightButtonCallback(void);
+char *secondString(char *fullString);
+void stringCopy(char *outString, const char *copiedString);
+void taskCommandServicer(void);
 
 #endif /* MAINHEAD_H_ */
