@@ -378,7 +378,7 @@ void commandEntry(char *command) {
         char *payloadBuffer;
         payloadBuffer = secondString(tickerCountBuffer);
 
-        if(!tickerIndexBuffer){
+        if(!tickerIndexBuffer || atoi(tickerIndexBuffer) < 0 || atoi(tickerIndexBuffer) > TICKERNUM){
             int i = 0;
             for(i = 0; i < TICKERNUM; i++){
                 char tickerOutputBuffer[48];
@@ -439,12 +439,14 @@ void commandEntry(char *command) {
                 UART_write(Glo.uart, regOutputBuffer, strlen(regOutputBuffer));
             }
             UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+            return;
         }
         else if(!regOperatorBuffer){
             char regOutputBuffer[48];
             sprintf(regOutputBuffer, "\r\nRegister %2d :\t%4d", atoi(regInBuffer), Glo.reg[atoi(regInBuffer)]);
             UART_write(Glo.uart, regOutputBuffer, strlen(regOutputBuffer));
             UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+            return;
         }
         else if(commandTest("=", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)]  = operand1;
         else if(commandTest("++", regOperatorBuffer)) Glo.reg[atoi(regInBuffer)] = operand1 + 1;
@@ -468,8 +470,18 @@ void commandEntry(char *command) {
             int32_t tempReg;
             tempReg = Glo.reg[atoi(regInBuffer)];
             Glo.reg[atoi(regInBuffer)]  = operand1;
-            if(operand1 >= 0 && operand1 < REGISTERNUM) Glo.reg[operand1] = tempReg;
+            if(operand1 >= 0 && operand1 < REGISTERNUM) Glo.reg[atoi(regOperandBuffer1)] = tempReg;
+            char regResultXBuffer[48];
+            sprintf(regResultXBuffer, "Register %d: %d", atoi(regOperandBuffer1), tempReg);
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+            UART_write(Glo.uart, regResultXBuffer, strlen(regResultXBuffer));
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
         }
+        char regResultBuffer[48];
+        sprintf(regResultBuffer, "Register %d: %d", atoi(regInBuffer), Glo.reg[atoi(regInBuffer)]);
+        UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+        UART_write(Glo.uart, regResultBuffer, strlen(regResultBuffer));
+        UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
     }
     else if(commandTest("-script", command)) {
         char *scriptSetBuffer;
@@ -530,9 +542,6 @@ void commandEntry(char *command) {
 
         int i;
         i = indexOf(resultTrueBuffer, ':');
-//        for(i = 0; i<strlen(resultTrueBuffer); i++){
-//            if(resultTrueBuffer[i]==':') break;
-//        }
         colonBuffer=&resultTrueBuffer[i];
         if(colonBuffer[0] != ':') i++;
         resultTrueBuffer[i-1] = 0;
@@ -586,7 +595,14 @@ void commandEntry(char *command) {
             }
         }
     }
-    else errorCount[1]++;
+    else {
+        errorCount[1]++;
+        char errorMessage[48];
+        sprintf(errorMessage, "%s Not Recognized as a Valid Command", command);
+        UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+        UART_write(Glo.uart, errorMessage, strlen(errorMessage));
+        UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+    }
 }
 
 int commandTest(const char *command, const char *compareString){
