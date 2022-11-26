@@ -19,6 +19,144 @@
 
 
 /*
+ *  =============================== ADC ===============================
+ */
+
+#include <ti/drivers/ADC.h>
+#include <ti/drivers/adc/ADCMSP432E4.h>
+#include <ti/devices/msp432e4/driverlib/adc.h>
+
+#define CONFIG_ADC_COUNT 1
+
+/*
+ *  ======== ADCMSP432E4Objects ========
+ */
+ADCMSP432E4_Object ADCMSP432E4Objects[CONFIG_ADC_COUNT];
+
+/*
+ *  ======== ADCMSP432E4HWAttrs ========
+ */
+const ADCMSP432E4_HWAttrsV1 ADCMSP432E4HWAttrs[CONFIG_ADC_COUNT] = {
+    /* CONFIG_ADC_0 */
+    {
+        .adcPin = ADCMSP432E4_PD_5_A6,
+        .refVoltage = ADCMSP432E4_VREF_INTERNAL,
+        .adcModule = ADCMSP432E4_MOD1,
+        .adcSeq = ADCMSP432E4_SEQ0
+    },
+};
+
+/*
+ *  ======== ADC_config ========
+ */
+const ADC_Config ADC_config[CONFIG_ADC_COUNT] = {
+    /* CONFIG_ADC_0 */
+    {
+        .fxnTablePtr = &ADCMSP432E4_fxnTable,
+        .object = &ADCMSP432E4Objects[CONFIG_ADC_0],
+        .hwAttrs = &ADCMSP432E4HWAttrs[CONFIG_ADC_0]
+    },
+};
+
+const uint_least8_t CONFIG_ADC_0_CONST = CONFIG_ADC_0;
+const uint_least8_t ADC_count = CONFIG_ADC_COUNT;
+
+
+/*
+ *  =============================== ADCBuf ===============================
+ */
+
+#include <ti/drivers/ADCBuf.h>
+#include <ti/drivers/adcbuf/ADCBufMSP432E4.h>
+
+#include <ti/devices/msp432e4/inc/msp432.h>
+
+#define CONFIG_ADCBUF_COUNT 1
+
+/*
+ *  ======== adcbufMSP432E4Objects ========
+ */
+ADCBufMSP432E4_Object adcbufMSP432E4Objects[CONFIG_ADCBUF_COUNT];
+
+/*
+ *  ======== ADCBuf Channels ========
+ */
+ADCBufMSP432E4_Channels adcBuf0MSP432E4Channels[] = {
+    /* ADCBUF_CHANNEL_0 */
+    {
+        .adcPin = ADCBufMSP432E4_PE_3_A0,
+        .adcSequence = ADCBufMSP432E4_Seq_0,
+        .adcInputMode = ADCBufMSP432E4_SINGLE_ENDED,
+        .adcDifferentialPin = ADCBufMSP432E4_PIN_NONE,
+        .adcInternalSource = ADCBufMSP432E4_INTERNAL_SOURCE_MODE_OFF,
+        .refVoltage = 3300000
+    },
+};
+
+/*
+ *  ======== ADCBuf Seqeunce Priorities ========
+ */
+static ADCBufMSP432E4_SequencePriorities seqPriorities0[ADCBufMSP432E4_SEQUENCER_COUNT] = {
+    /* Sequencer 0 */
+    ADCBufMSP432E4_Priority_0,
+    /* Sequencer 1 */
+    ADCBufMSP432E4_Seq_Disable,
+    /* Sequencer 2 */
+    ADCBufMSP432E4_Seq_Disable,
+    /* Sequencer 3 */
+    ADCBufMSP432E4_Seq_Disable,
+};
+
+/*
+ *  ======== ADCBuf Seqeunce Trigger Sources ========
+ */
+static ADCBufMSP432E4_TriggerSource triggerSource0[ADCBufMSP432E4_SEQUENCER_COUNT] = {
+    /* Sequencer 0 trigger source */
+    ADCBufMSP432E4_TIMER_TRIGGER,
+    /* Sequencer 1 trigger source */
+    ADCBufMSP432E4_SOFTWARE_AUTOMATIC_TRIGGER,
+    /* Sequencer 2 trigger source */
+    ADCBufMSP432E4_SOFTWARE_AUTOMATIC_TRIGGER,
+    /* Sequencer 3 trigger source */
+    ADCBufMSP432E4_SOFTWARE_AUTOMATIC_TRIGGER,
+};
+
+/*
+ *  ======== adcbufMSP432E4HWAttrs ========
+ */
+const ADCBufMSP432E4_HWAttrsV1 adcbufMSP432E4HWAttrs[CONFIG_ADCBUF_COUNT] = {
+    /* CONFIG_ADCBUF_0 */
+    {
+        .intPriority = 0xa0,
+        .adcBase = ADC0_BASE,
+        .channelSetting = adcBuf0MSP432E4Channels,
+        .sequencePriority = seqPriorities0,
+        .adcTriggerSource = triggerSource0,
+        .modulePhase = ADCBufMSP432E4_Phase_Delay_0,
+        .refSource = ADCBufMSP432E4_VREF_INTERNAL,
+        .useDMA = 1,
+        .adcTimerSource = TIMER1_BASE
+    },
+};
+
+/*
+ *  ======== ADCBuf_config ========
+ */
+const ADCBuf_Config ADCBuf_config[CONFIG_ADCBUF_COUNT] = {
+    /* CONFIG_ADCBUF_0 */
+    {
+        .fxnTablePtr = &ADCBufMSP432E4_fxnTable,
+        .object = &adcbufMSP432E4Objects[CONFIG_ADCBUF_0],
+        .hwAttrs = &adcbufMSP432E4HWAttrs[CONFIG_ADCBUF_0]
+    },
+};
+
+const uint_least8_t CONFIG_ADCBUF_0_CONST = CONFIG_ADCBUF_0;
+const uint_least8_t ADCBUF_CHANNEL_0_CONST = ADCBUF_CHANNEL_0;
+const uint_least8_t ADCBuf_count = CONFIG_ADCBUF_COUNT;
+
+
+/*
  *  =============================== DMA ===============================
  */
 
@@ -188,6 +326,63 @@ const PowerMSP432E4_Config PowerMSP432E4_config = {
 
 
 /*
+ *  =============================== SPI ===============================
+ */
+
+#include <ti/drivers/SPI.h>
+#include <ti/drivers/spi/SPIMSP432E4DMA.h>
+
+#include <ti/devices/msp432e4/inc/msp432.h>
+#include <ti/devices/msp432e4/driverlib/adc.h>
+#include <ti/devices/msp432e4/driverlib/interrupt.h>
+#include <ti/devices/msp432e4/driverlib/pwm.h>
+#include <ti/devices/msp432e4/driverlib/sysctl.h>
+#include <ti/devices/msp432e4/driverlib/udma.h>
+
+#define CONFIG_SPI_COUNT 1
+
+/*
+ *  ======== spiMSP432E4DMAObjects ========
+ */
+SPIMSP432E4DMA_Object spiMSP432E4DMAObjects[CONFIG_SPI_COUNT];
+
+/*
+ *  ======== spiMSP432E4DMAHWAttrs ========
+ */
+const SPIMSP432E4DMA_HWAttrs spiMSP432E4DMAHWAttrs[CONFIG_SPI_COUNT] = {
+    /* CONFIG_SPI_0 */
+    {
+        .baseAddr = SSI3_BASE,
+        .intNum = INT_SSI3,
+        .intPriority = 0x20,
+        .defaultTxBufValue = ~0,
+        .rxDmaChannel = NULL,
+        .txDmaChannel = UDMA_CH15_SSI3TX,
+        .clkPinMask  = SPIMSP432E4_PQ0_SSI3CLK,
+        .xdat0PinMask = SPIMSP432E4_PQ2_SSI3XDAT0,
+        .xdat1PinMask = SPIMSP432E4_PIN_NO_CONFIG,
+        .fssPinMask  = SPIMSP432E4_PQ1_SSI3FSS,
+        .minDmaTransferSize = 10
+    },
+};
+
+/*
+ *  ======== SPI_config ========
+ */
+const SPI_Config SPI_config[CONFIG_SPI_COUNT] = {
+    /* CONFIG_SPI_0 */
+    {
+        .fxnTablePtr = &SPIMSP432E4DMA_fxnTable,
+        .object = &spiMSP432E4DMAObjects[CONFIG_SPI_0],
+        .hwAttrs = &spiMSP432E4DMAHWAttrs[CONFIG_SPI_0]
+    },
+};
+
+const uint_least8_t CONFIG_SPI_0_CONST = CONFIG_SPI_0;
+const uint_least8_t SPI_count = CONFIG_SPI_COUNT;
+
+
+/*
  *  =============================== Timer ===============================
  */
 
@@ -209,16 +404,16 @@ TimerMSP432E4_Object timerMSP432E4Objects[CONFIG_TIMER_COUNT];
 const TimerMSP432E4_HWAttrs timerMSP432E4HWAttrs[CONFIG_TIMER_COUNT] = {
     /* CONFIG_TIMER_0 */
     {
-        .baseAddress = TIMER2_BASE,
+        .baseAddress = TIMER3_BASE,
         .subTimer    = TimerMSP432E4_timer32,
-        .intNum      = INT_TIMER2A,
-        .intPriority = 0x80
+        .intNum      = INT_TIMER3A,
+        .intPriority = 0x20
     },
     /* CONFIG_TIMER_1 */
     {
-        .baseAddress = TIMER1_BASE,
+        .baseAddress = TIMER2_BASE,
         .subTimer    = TimerMSP432E4_timer32,
-        .intNum      = INT_TIMER1A,
+        .intNum      = INT_TIMER2A,
         .intPriority = 0x60
     },
 };
@@ -254,11 +449,12 @@ const uint_least8_t Timer_count = CONFIG_TIMER_COUNT;
 #include <ti/drivers/uart/UARTMSP432E4.h>
 #include <ti/devices/msp432e4/driverlib/interrupt.h>
 
-#define CONFIG_UART_COUNT 1
+#define CONFIG_UART_COUNT 2
 
 UARTMSP432E4_Object uartMSP432E4Objects[CONFIG_UART_COUNT];
 
 static unsigned char uartMSP432E4RingBuffer0[32];
+static unsigned char uartMSP432E4RingBuffer1[128];
 static const UARTMSP432E4_HWAttrs uartMSP432E4HWAttrs[CONFIG_UART_COUNT] = {
   {
     .baseAddr           = UART0_BASE,
@@ -273,6 +469,19 @@ static const UARTMSP432E4_HWAttrs uartMSP432E4HWAttrs[CONFIG_UART_COUNT] = {
     .rtsPin             = UARTMSP432E4_PIN_UNASSIGNED,
     .errorFxn           = NULL
   },
+  {
+    .baseAddr           = UART7_BASE,
+    .intNum             = INT_UART7,
+    .intPriority        = (~0),
+    .flowControl        = UARTMSP432E4_FLOWCTRL_NONE,
+    .ringBufPtr         = uartMSP432E4RingBuffer1,
+    .ringBufSize        = sizeof(uartMSP432E4RingBuffer1),
+    .rxPin              = UARTMSP432E4_PC4_U7RX,
+    .txPin              = UARTMSP432E4_PC5_U7TX,
+    .ctsPin             = UARTMSP432E4_PIN_UNASSIGNED,
+    .rtsPin             = UARTMSP432E4_PIN_UNASSIGNED,
+    .errorFxn           = NULL
+  },
 };
 
 const UART_Config UART_config[CONFIG_UART_COUNT] = {
@@ -281,10 +490,16 @@ const UART_Config UART_config[CONFIG_UART_COUNT] = {
         .object      = &uartMSP432E4Objects[CONFIG_UART_0],
         .hwAttrs     = &uartMSP432E4HWAttrs[CONFIG_UART_0]
     },
+    {   /* CONFIG_UART_7 */
+        .fxnTablePtr = &UARTMSP432E4_fxnTable,
+        .object      = &uartMSP432E4Objects[CONFIG_UART_7],
+        .hwAttrs     = &uartMSP432E4HWAttrs[CONFIG_UART_7]
+    },
 };
 
 const uint_least8_t CONFIG_UART_0_CONST = CONFIG_UART_0;
-const uint_least8_t UART_count = 1;
+const uint_least8_t CONFIG_UART_7_CONST = CONFIG_UART_7;
+const uint_least8_t UART_count = 2;
 
 
 #include <ti/drivers/Board.h>

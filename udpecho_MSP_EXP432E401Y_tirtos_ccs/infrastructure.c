@@ -14,6 +14,7 @@ int rightButtonCallbackCount = 0;
 int messageIndex = 0;
 char newLine[2] = "\r\n";
 extern Semaphore_Handle semaphore0;
+extern Semaphore_Handle semaphore1;
 
 char        input;
 
@@ -37,6 +38,7 @@ const char helpGPIOOutput[]     = "\r\n-gpio allows to you read (-r), toggle (-t
                                   "\r\n\tThe first argument is the pin number, second argument is the command type (-t, -w, -r),"
                                   "\r\n\tand the third is 1 or 0 if you are writing high or low"
                                   "\r\n\t0-3 are LEDs 1-4, 4 and 5 are the left and right buttons, 6 is PK5 and 7 is PD4(*RX)."
+                                  "\r\n\tWhen connected to the BOOSTXL-AUDIO PK5 (GPIO 6) set to 0 (low) turns the amp on, while setting PD4(*RX) to 1 turns the mic on."
                                   "\r\n\tEx: -gpio 0 -w 1. Turns on GPIO 1.\r\n";
 
 const char helpErrorOutput[]    = "\r\n-error shows the current count of errors.\r\n";
@@ -99,7 +101,12 @@ const char helpScriptOutput[]   = "\r\n-script gets and sets 32 lines of a scrip
                                   "\r\n\tThe third argument is the command you wish to write."
                                   "\r\n\tCalling -script with no arguments or only -r prints the contents of all 32 lines."
                                   "\r\n\tCalling -script -x will execute all lines starting from 0 to the next blank line or the end."
-                                  "\r\n\tEx: -script -x 4. Executes line 4 and all lines after until a blank line or the end\r\n";
+                                  "\r\n\tEx: -script -x 4. Executes line 4 and all lines after until a blank line or the end."
+                                  "\r\n\tScript 0-3 is a conditional test you can call with -script 2."
+                                  "\r\n\tScript 6-8 turns on audio output."
+                                  "\r\n\tScript 10-13 turns on audio input."
+                                  "\r\n\tScript 15-16 turns off audio output."
+                                  "\r\n\tScript 18-20 turns off audio input.\r\n";
 
 const char helpIfOutput[]       = "\r\n-if allows you to compare two values and execute commands based on the result."
                                   "\r\n\tThe values can be immediate (# in front) or registers."
@@ -115,6 +122,30 @@ const char helpIfOutput[]       = "\r\n-if allows you to compare two values and 
                                   "\r\n\tEx: -if 4 > #3 ? -gpio 0 -t : -gpio 1 -t."
                                   "\r\n\tIf the value in register 4 is greater than 3 then GPIO 0 will toggle, otherwise GPIO 1 will toggle.\r\n";
 
+const char helpUartOutput[]     = "\r\n-uart sends the payload out of UART 7."
+                                  "\r\n\tUART 7 corresponds to TX pin PC5 and RX pin PC4."
+                                  "\r\n\tThe only argument is the payload."
+                                  "\r\n\tEx: -uart -print hello."
+                                  "\r\n\tWill send '-print hello' out of UART 7.\r\n";
+
+const char helpSineOutput[]     = "\r\n-sine outputs a tone of the specified frequency from the BOOSTXL-AUDIO board."
+                                  "\r\n\tThe only argument is the frequency."
+                                  "\r\n\tSetting the frequency to 0 will turn off sine."
+                                  "\r\n\tEx: -sine 220."
+                                  "\r\n\tPlays a tone with 220 Hz frequency (A note).\r\n";
+
+const char helpNetudpOutput[]   = "\r\n-netudp sends a payload to the specified IP and port number."
+                                  "\r\n\tThe first argument is the IP address and port number to send to separated by a colon."
+                                  "\r\n\tThe second argument is the payload."
+                                  "\r\n\tEx: -netudp 10.0.0.6:1000 -print hello."
+                                  "\r\n\tSends '-print hello' to the IP Address 10.0.0.6, port 1000.\r\n";
+
+const char helpAudioOutput[]    = "\r\n-audio turns on the mic and starts playing the audio out of the speaker on the audio board."
+                                  "\r\n\tThere are no arguments, entering the command toggles the functionality on and off."
+                                  "\r\n\tInitital state is off."
+                                  "\r\n\tEx: -audio."
+                                  "\r\n\tTurns on mic and starts playing audio if in initial state, turns off mic otherwise.\r\n";
+
 const char help[] = "-help";
 const char about[] = "-about";
 char command[128] = "";
@@ -126,74 +157,26 @@ char arrowInput[2] = "";
 int errorCount[] = {0, 0, 0};
 int overflowFlag = 0;
 int callbackPeriod = 1000000;
-
-void infra(void){
-    Glo.var.helpAboutOutput = helpAboutOutput;
-    Glo.var.input = input;
-    Glo.var.echoPrompt = echoPrompt;
-    Glo.var.helpHelpOutput = helpHelpOutput;
-    Glo.var.helpPrintOutput = helpPrintOutput;
-    Glo.var.helpMemrOutput = helpMemrOutput;
-    Glo.var.helpGPIOOutput = helpGPIOOutput;
-    Glo.var.helpErrorOutput = helpErrorOutput;
-    Glo.var.helpTimerOutput = helpTimerOutput;
-    Glo.var.helpCallbackOutput = helpCallbackOutput;
-    Glo.var.helpTickerOutput = helpTickerOutput;
-    Glo.var.helpRegOutput = helpRegOutput;
-    Glo.var.helpScriptOutput = helpScriptOutput;
-    Glo.var.helpIfOutput = helpIfOutput;
-
-    Glo.var.help = help;
-    Glo.var.about = about;
-    Glo.var.command = command;
-    Glo.var.previousCommand = previousCommand;
-    Glo.var.callbackCommand = callbackCommand;
-
-    Glo.var.i = i;
-    Glo.var.arrowInput = arrowInput;
-    Glo.var.errorCount[0] = errorCount[0];
-    Glo.var.errorCount[1] = errorCount[1];
-    Glo.var.errorCount[2] = errorCount[2];
-    Glo.var.overflowFlag = overflowFlag;
-
-    sprintf(aboutOutput, "\r\nSteve Gillet, Assignment 3, v1.431234, %s, %s\r\n", __TIME__, __DATE__); //put outside subroutine
-    Glo.var.aboutOutput = aboutOutput;
-    Glo.callback[0].callbackCount = timerCallbackCount;
-    Glo.callback[1].callbackCount = leftButtonCallbackCount;
-    Glo.callback[2].callbackCount = rightButtonCallbackCount;
-    Glo.var.messageIndex = messageIndex;
-    Glo.var.newLine = newLine;
-    Glo.msgQue.readIndex = 0;
-    Glo.msgQue.writeIndex = 0;
-    Glo.msgQueSem = semaphore0;
-    Glo.callback[0].payload[0] = 0;
-    Glo.callback[1].payload[0] = 0;
-    Glo.callback[2].payload[0] = 0;
-    Glo.callback[0].period = callbackPeriod;
-
-    for(i = 0; i < TICKERNUM; i++){
-        Glo.ticker[i].period = 0;
-        Glo.ticker[i].delay = 0;
-        Glo.ticker[i].tickerCount = 0;
-        Glo.ticker[i].payload[0] = 0;
-    }
-
-    for(i = 0; i < REGISTERNUM; i++){
-        Glo.reg[i] = i * 10;
-    }
-
-    for(i = 0; i < SCRIPTNUM; i++){
-        Glo.script[i].payload[0] = 0;
-    }
-    stringCopy(Glo.script[0].payload, "-gpio 0 -t");
-    stringCopy(Glo.script[2].payload, "-if 4 > 3 ? -script -x 0");
-    stringCopy(Glo.script[3].payload, "-gpio 1 -t");
-}
+uint16_t sineBuffer;
+extern uint16_t sineVal[256];
+double sineIndex = 0;
+double indexJump = 4;
+double sineRemainder = 0;
+uint16_t outVal = 0;
 
 void addMessage(const char *inMessage){
     stringCopy(Glo.msgQue.messages[Glo.msgQue.writeIndex].message, inMessage);
     Glo.msgQue.writeIndex++;
     if(Glo.msgQue.writeIndex == QUELEN) Glo.msgQue.writeIndex = 0;
+}
+
+void audioFoo(uint16_t convBuffer){
+    SPI_Transaction spiTransaction;
+
+    spiTransaction.count = 1;
+    spiTransaction.txBuf = (void *) &convBuffer;
+    spiTransaction.rxBuf = (void *) NULL;
+    SPI_transfer(Glo.sine.spi, &spiTransaction);
 }
 
 void commandEntry(char *command) {
@@ -213,6 +196,10 @@ void commandEntry(char *command) {
         else if(strstr(helpCommand, "reg")) UART_write(Glo.uart, Glo.var.helpRegOutput, strlen(Glo.var.helpRegOutput));
         else if(strstr(helpCommand, "script")) UART_write(Glo.uart, Glo.var.helpScriptOutput, strlen(Glo.var.helpScriptOutput));
         else if(strstr(helpCommand, "if")) UART_write(Glo.uart, Glo.var.helpIfOutput, strlen(Glo.var.helpIfOutput));
+        else if(strstr(helpCommand, "uart")) UART_write(Glo.uart, Glo.var.helpUartOutput, strlen(Glo.var.helpUartOutput));
+        else if(strstr(helpCommand, "sine")) UART_write(Glo.uart, Glo.var.helpSineOutput, strlen(Glo.var.helpSineOutput));
+        else if(strstr(helpCommand, "netudp")) UART_write(Glo.uart, Glo.var.helpNetudpOutput, strlen(Glo.var.helpNetudpOutput));
+        else if(strstr(helpCommand, "audio")) UART_write(Glo.uart, Glo.var.helpAudioOutput, strlen(Glo.var.helpAudioOutput));
         else{
             UART_write(Glo.uart, Glo.var.helpHelpOutput, indexOf(Glo.var.helpHelpOutput, '\t'));
             UART_write(Glo.uart, Glo.var.helpAboutOutput, indexOf(Glo.var.helpAboutOutput, '\t'));
@@ -226,6 +213,10 @@ void commandEntry(char *command) {
             UART_write(Glo.uart, Glo.var.helpRegOutput, indexOf(Glo.var.helpRegOutput, '\t'));
             UART_write(Glo.uart, Glo.var.helpScriptOutput, indexOf(Glo.var.helpScriptOutput, '\t'));
             UART_write(Glo.uart, Glo.var.helpIfOutput, indexOf(Glo.var.helpIfOutput, '\t'));
+            UART_write(Glo.uart, Glo.var.helpUartOutput, indexOf(Glo.var.helpUartOutput, '\t'));
+            UART_write(Glo.uart, Glo.var.helpSineOutput, indexOf(Glo.var.helpSineOutput, '\t'));
+            UART_write(Glo.uart, Glo.var.helpNetudpOutput, indexOf(Glo.var.helpNetudpOutput, '\t'));
+            UART_write(Glo.uart, Glo.var.helpAudioOutput, indexOf(Glo.var.helpAudioOutput, '\t'));
        }
     }
     else if(commandTest(about, command)) UART_write(Glo.uart, Glo.var.aboutOutput, strlen(Glo.var.aboutOutput));
@@ -286,6 +277,7 @@ void commandEntry(char *command) {
             UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
             if(GPIO_read(pinNumber)) UART_write(Glo.uart, "1", 1);
             else UART_write(Glo.uart, "0", 1);
+            UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
         }
         else if(commandTest("-t", gpioBuffer)){
             GPIO_toggle(pinNumber);
@@ -595,6 +587,79 @@ void commandEntry(char *command) {
             }
         }
     }
+    else if(commandTest("-uart", command)){
+        char *uartBuffer;
+        uartBuffer = secondString(command);
+        strcat(uartBuffer, "\n");
+        UART_write(Glo.uart7, uartBuffer, strlen(uartBuffer));
+    }
+    else if(commandTest("-sine", command)){
+        char *sineBuffer;
+        SPI_Transaction spiTransaction;
+        sineBuffer = secondString(command);
+        if(sineBuffer){
+            if(atoi(sineBuffer) == 0){
+                addMessage("-script -x 15");
+                Semaphore_post(Glo.msgQueSem);
+            }
+            else{
+                addMessage("-script -x 6");
+                Semaphore_post(Glo.msgQueSem);
+            }
+            double sineFreq = atoi(sineBuffer);
+            Glo.sine.indexJump = sineFreq*125.*256./1000000.;
+        }
+        Glo.sine.remainder = Glo.sine.sineIndex - floor(Glo.sine.sineIndex);
+        Glo.sine.outVal = (int) Glo.sine.sineVal[(int) floor(Glo.sine.sineIndex)] * (1. - Glo.sine.remainder) + Glo.sine.sineVal[(int) floor(Glo.sine.sineIndex) + 1] * (Glo.sine.remainder);
+        spiTransaction.count = 1;
+        spiTransaction.txBuf = (void *) &Glo.sine.outVal;
+        spiTransaction.rxBuf = (void *) NULL;
+        SPI_transfer(Glo.sine.spi, &spiTransaction);
+        Glo.sine.sineIndex += Glo.sine.indexJump;
+        if(Glo.sine.sineIndex >= 256.) Glo.sine.sineIndex = Glo.sine.sineIndex - 256.;
+    }
+    else if(commandTest("-netudp", command)){
+        // gate to protect netudp for only one at a time
+        char *udpBuffer;
+        udpBuffer = secondString(command);
+        int i;
+        i = indexOf(udpBuffer, ':');
+        int j = 0;
+        for(j = 0; j < i; j++) Glo.udp.ip[j] = udpBuffer[j];
+        Glo.udp.ip[j] = 0;
+        i++;
+        for(j = 0; j < strlen(udpBuffer); j++){
+            if(udpBuffer[j + i] == ' ') break;
+            Glo.udp.port[j] = udpBuffer[j + i];
+        }
+
+        char *payloadBuffer;
+        payloadBuffer = secondString(udpBuffer);
+
+        if(commandTest("-mic", payloadBuffer)){
+            Glo.voice.voiceOut = !Glo.voice.voiceOut;
+        }
+
+        stringCopy(Glo.udp.payload, payloadBuffer);
+
+        Semaphore_post(Glo.udp.sem);
+    }
+    else if(commandTest("-audio", command)){
+        if(!Glo.adc.audioOn){
+            addMessage("-script -x 10");
+            Semaphore_post(Glo.msgQueSem);
+        }
+        else {
+            commandEntry("-callback 0 0");
+            addMessage("-script -x 18");
+            Semaphore_post(Glo.msgQueSem);
+        }
+        Glo.adc.audioOn = !Glo.adc.audioOn;
+    }
+    else if(commandTest("-voice", command)){
+        Glo.voice.voiceIn = 1;
+        Glo.voice.buffer = &command[7];
+    }
     else {
         errorCount[1]++;
         char errorMessage[48];
@@ -619,11 +684,120 @@ int indexOf(const char *string, const char character){
     return i;
 }
 
+void infra(void){
+    Glo.var.helpAboutOutput = helpAboutOutput;
+    Glo.var.input = input;
+    Glo.var.echoPrompt = echoPrompt;
+    Glo.var.helpHelpOutput = helpHelpOutput;
+    Glo.var.helpPrintOutput = helpPrintOutput;
+    Glo.var.helpMemrOutput = helpMemrOutput;
+    Glo.var.helpGPIOOutput = helpGPIOOutput;
+    Glo.var.helpErrorOutput = helpErrorOutput;
+    Glo.var.helpTimerOutput = helpTimerOutput;
+    Glo.var.helpCallbackOutput = helpCallbackOutput;
+    Glo.var.helpTickerOutput = helpTickerOutput;
+    Glo.var.helpRegOutput = helpRegOutput;
+    Glo.var.helpScriptOutput = helpScriptOutput;
+    Glo.var.helpIfOutput = helpIfOutput;
+    Glo.var.helpUartOutput = helpUartOutput;
+    Glo.var.helpSineOutput = helpSineOutput;
+    Glo.var.helpNetudpOutput = helpNetudpOutput;
+    Glo.var.helpAudioOutput = helpAudioOutput;
+
+    Glo.var.help = help;
+    Glo.var.about = about;
+    Glo.var.command = command;
+    Glo.var.previousCommand = previousCommand;
+    Glo.var.callbackCommand = callbackCommand;
+
+    Glo.var.i = i;
+    Glo.var.arrowInput = arrowInput;
+    Glo.var.errorCount[0] = errorCount[0];
+    Glo.var.errorCount[1] = errorCount[1];
+    Glo.var.errorCount[2] = errorCount[2];
+    Glo.var.overflowFlag = overflowFlag;
+
+    sprintf(aboutOutput, "\r\nSteve Gillet, Assignment 3, v1.431234, %s, %s\r\n", __TIME__, __DATE__); //put outside subroutine
+    Glo.var.aboutOutput = aboutOutput;
+    Glo.callback[0].callbackCount = timerCallbackCount;
+    Glo.callback[1].callbackCount = leftButtonCallbackCount;
+    Glo.callback[2].callbackCount = rightButtonCallbackCount;
+    Glo.var.messageIndex = messageIndex;
+    Glo.var.newLine = newLine;
+    Glo.msgQue.readIndex = 0;
+    Glo.msgQue.writeIndex = 0;
+    Glo.msgQueSem = semaphore0;
+    Glo.callback[0].payload[0] = 0;
+    Glo.callback[1].payload[0] = 0;
+    Glo.callback[2].payload[0] = 0;
+    Glo.callback[0].period = callbackPeriod;
+
+    for(i = 0; i < TICKERNUM; i++){
+        Glo.ticker[i].period = 0;
+        Glo.ticker[i].delay = 0;
+        Glo.ticker[i].tickerCount = 0;
+        Glo.ticker[i].payload[0] = 0;
+    }
+
+    for(i = 0; i < REGISTERNUM; i++){
+        Glo.reg[i] = i * 10;
+    }
+
+    for(i = 0; i < SCRIPTNUM; i++){
+        Glo.script[i].payload[0] = 0;
+    }
+    // test conditional script, if true it jumps back to 0 and then picks up where it left off when done
+    stringCopy(Glo.script[0].payload, "-gpio 0 -t");
+    stringCopy(Glo.script[2].payload, "-if 4 > 3 ? -script -x 0");
+    stringCopy(Glo.script[3].payload, "-gpio 1 -t");
+
+    // sine on
+    stringCopy(Glo.script[6].payload, "-gpio 6 -w 0");
+    stringCopy(Glo.script[7].payload, "-timer 125");
+    stringCopy(Glo.script[8].payload, "-callback 0 -1 -sine");
+
+    // mic on
+    stringCopy(Glo.script[10].payload, "-gpio 6 -w 0");
+    stringCopy(Glo.script[11].payload, "-gpio 7 -w 1");
+    stringCopy(Glo.script[12].payload, "-timer 125");
+    stringCopy(Glo.script[13].payload, "-callback 0 -1");
+
+    // sine off
+    stringCopy(Glo.script[15].payload, "-gpio 6 -w 1");
+    stringCopy(Glo.script[16].payload, "-callback 0 0");
+
+    // mic off
+    stringCopy(Glo.script[18].payload, "-gpio 6 -w 1");
+    stringCopy(Glo.script[19].payload, "-gpio 7 -w 0");
+    stringCopy(Glo.script[20].payload, "-callback 0 0");
+
+    Glo.sine.sineVal = sineVal;
+    Glo.sine.sineIndex = sineIndex;
+    Glo.sine.indexJump = indexJump;
+    Glo.sine.remainder = sineRemainder;
+    Glo.sine.outVal = outVal;
+
+    Glo.udp.sem = semaphore1;
+
+    Glo.adc.audioOn = false;
+
+    Glo.voice.voiceIn = 0;
+    Glo.voice.voiceOut = 0;
+    Glo.voice.index = 0;
+}
+
 void initializeDrivers(void){
     Timer_Handle timer0, timer1;
     Timer_Params params;
-    UART_Handle uart;
+    UART_Handle uart, uart7;
     UART_Params uartParams;
+    SPI_Handle spi;
+    SPI_Params spiParams;
+    ADC_Handle adcHandle;
+    ADC_Params adcParams;
+    ADCBuf_Handle adcBufHandle;
+    ADCBuf_Params adcBufParams;
+
 
     /* Call driver init functions */
     Board_init();
@@ -632,7 +806,11 @@ void initializeDrivers(void){
     GPIO_init();
     GPIO_enableInt(4);
     GPIO_enableInt(5);
-
+    SPI_init();
+    ADC_init();
+    ADC_Params_init(&adcParams);
+    ADCBuf_init();
+    ADCBuf_Params_init(&adcBufParams);
 
     Timer_Params_init(&params);
     params.period = Glo.callback[0].period;
@@ -683,9 +861,53 @@ void initializeDrivers(void){
         /* UART_open() failed */
         while (1);
     }
+
+    UART_Params_init(&uartParams);
+    uartParams.writeDataMode = UART_DATA_BINARY;
+    uartParams.readDataMode = UART_DATA_TEXT;
+    uartParams.readReturnMode = UART_RETURN_NEWLINE;
+    uartParams.readEcho = UART_ECHO_OFF;
+    uartParams.baudRate = 115200;
+
+    uart7 = UART_open(CONFIG_UART_7, &uartParams);
+
+    if (uart7 == NULL) {
+        /* UART_open() failed */
+        while (1);
+    }
+
     Glo.timer0 = timer0;
     Glo.timer1 = timer1;
     Glo.uart = uart;
+    Glo.uart7 = uart7;
+
+    SPI_Params_init(&spiParams);
+    spiParams.dataSize = 16;
+
+    spiParams.frameFormat = SPI_POL0_PHA1;
+    spi = SPI_open(CONFIG_SPI_0, &spiParams);
+    //dac datasheet
+    if (spi == NULL){
+        while(1);
+    }
+
+    Glo.sine.spi = spi;
+
+    adcParams.isProtected = true;
+
+    adcHandle = ADC_open(0, &adcParams);
+    if (adcHandle == NULL)
+    {
+        //ADCBuf_open() failed.
+        while (1) {}
+    }
+    Glo.adc.handle = adcHandle;
+
+    adcBufParams.returnMode = ADCBuf_RETURN_MODE_BLOCKING;
+    adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_ONE_SHOT;
+
+    adcBufHandle = ADCBuf_open(0, &adcBufParams);
+    Glo.adc.bufferHandle = adcBufHandle;
 }
 
 void leftButtonCallback(void){
@@ -760,10 +982,42 @@ void tickerCallback(Timer_Handle myHandle, int_fast16_t status)
 void timerCallback(Timer_Handle myHandle, int_fast16_t status)
 {
     if(Glo.callback[0].callbackCount != 0){
-        addMessage(Glo.callback[0].payload);
-        Semaphore_post(Glo.msgQueSem);
+        if(Glo.adc.audioOn) {
+            uint16_t convBuffer;
+            ADC_convert(Glo.adc.handle, &convBuffer);
+            convBuffer *= 2;
+            audioFoo(convBuffer);
+        }
+        else if(Glo.voice.voiceIn) {
+            audioFoo(Glo.voice.buffer[Glo.voice.index++]);
+            if(Glo.voice.index >= VOICELEN){
+                Glo.voice.voiceIn = 0;
+                Glo.voice.index = 0;
+            }
+        }
+        else if(Glo.voice.voiceOut) {
+            uint16_t buffer[VOICELEN];
+            char printBuff[] = "-voice ";
+            ADCBuf_Conversion conversion = {0};
+            conversion.samplesRequestedCount = VOICELEN;
+            conversion.sampleBuffer = buffer;
+            conversion.adcChannel = 0;
+            // Start ADCBuf conversion
+            ADCBuf_convert(Glo.adc.bufferHandle, &conversion, 1);
+
+            Glo.udp.payload[0] = *printBuff;
+            Glo.udp.payload[7] = *buffer;
+
+            Semaphore_post(Glo.udp.sem);
+        }
+        else if(commandTest("-sine", Glo.callback[0].payload)) commandEntry(Glo.callback[0].payload);
+        else{
+            addMessage(Glo.callback[0].payload);
+            Semaphore_post(Glo.msgQueSem);
+        }
         if(Glo.callback[0].callbackCount>0){
             Glo.callback[0].callbackCount--;
         }
     }
 }
+

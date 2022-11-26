@@ -8,6 +8,10 @@
 /**
  * Import the modules used in this configuration.
  */
+const ADC     = scripting.addModule("/ti/drivers/ADC", {}, false);
+const ADC1    = ADC.addInstance();
+const ADCBuf  = scripting.addModule("/ti/drivers/ADCBuf", {}, false);
+const ADCBuf1 = ADCBuf.addInstance();
 const GPIO    = scripting.addModule("/ti/drivers/GPIO", {}, false);
 const GPIO1   = GPIO.addInstance();
 const GPIO2   = GPIO.addInstance();
@@ -18,11 +22,14 @@ const GPIO6   = GPIO.addInstance();
 const GPIO7   = GPIO.addInstance();
 const GPIO8   = GPIO.addInstance();
 const RTOS    = scripting.addModule("/ti/drivers/RTOS");
+const SPI     = scripting.addModule("/ti/drivers/SPI", {}, false);
+const SPI1    = SPI.addInstance();
 const Timer   = scripting.addModule("/ti/drivers/Timer", {}, false);
 const Timer1  = Timer.addInstance();
 const Timer2  = Timer.addInstance();
 const UART    = scripting.addModule("/ti/drivers/UART", {}, false);
 const UART1   = UART.addInstance();
+const UART2   = UART.addInstance();
 const General = scripting.addModule("/ti/ndk/General");
 const NIMU    = scripting.addModule("/ti/ndk/NIMU");
 const NIMU1   = NIMU.addInstance();
@@ -32,6 +39,14 @@ const SlNet1  = SlNet.addInstance();
 /**
  * Write custom configuration values to the imported modules.
  */
+ADC1.$name              = "CONFIG_ADC_0";
+ADC1.adc.adcPin.$assign = "expansion.38";
+
+ADCBuf1.$name                     = "CONFIG_ADCBUF_0";
+ADCBuf1.interruptPriority         = "5";
+ADCBuf1.sequencer0.$name          = "ti_drivers_adcbuf_ADCBufSeqMSP432E40";
+ADCBuf1.sequencer0.channel0.$name = "ADCBUF_CHANNEL_0";
+
 GPIO1.$name     = "CONFIG_GPIO_0";
 GPIO1.$hardware = system.deviceData.board.components.D1;
 
@@ -61,9 +76,18 @@ GPIO8.mode            = "Output";
 GPIO8.gpioPin.$assign = "expansion.40";
 
 
+SPI1.$name                = "CONFIG_SPI_0";
+SPI1.mode                 = "Four Pin SS Active Low";
+SPI1.duplex               = "Master TX Only";
+SPI1.dmaInterruptPriority = "1";
+SPI1.spi.$assign          = "SSI3";
+SPI1.spi.sclkPin.$assign  = "boosterpack2.7";
+SPI1.spi.mosiPin.$assign  = "boosterpack2.15";
+SPI1.spi.ssPin.$assign    = "boosterpack2.12";
+
 Timer1.$name             = "CONFIG_TIMER_0";
 Timer1.timerType         = "32 Bits";
-Timer1.interruptPriority = "4";
+Timer1.interruptPriority = "1";
 
 Timer2.$name             = "CONFIG_TIMER_1";
 Timer2.interruptPriority = "3";
@@ -71,6 +95,10 @@ Timer2.timerType         = "32 Bits";
 
 UART1.$name     = "CONFIG_UART_0";
 UART1.$hardware = system.deviceData.board.components.XDS110UART;
+
+UART2.$name          = "CONFIG_UART_7";
+UART2.ringBufferSize = 128;
+UART2.uart.$assign   = "UART7";
 
 General.ndkThreadStkSize      = 2048;
 General.lowPriTaskDefStkSize  = 2048;
@@ -95,18 +123,26 @@ SlNet1.enableSecureSocks = false;
  * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
  * re-solve from scratch.
  */
-GPIO1.gpioPin.$suggestSolution           = "expansion.87";
-GPIO2.gpioPin.$suggestSolution           = "expansion.85";
-GPIO3.gpioPin.$suggestSolution           = "expansion.64";
-GPIO4.gpioPin.$suggestSolution           = "expansion.66";
-GPIO5.gpioPin.$suggestSolution           = "expansion.82";
-GPIO6.gpioPin.$suggestSolution           = "expansion.84";
-RTOS.timer0.resource.$suggestSolution    = "Timer0";
-Timer1.timer.$suggestSolution            = "Timer2";
-Timer2.timer.$suggestSolution            = "Timer1";
-UART1.uart.$suggestSolution              = "UART0";
-UART1.uart.txPin.$suggestSolution        = "expansion.76";
-UART1.uart.rxPin.$suggestSolution        = "expansion.74";
-NIMU1.emac.emac.$suggestSolution         = "ETHERNET0";
-NIMU1.emac.emac.led0Pin.$suggestSolution = "boosterpack2.39";
-NIMU1.emac.emac.led1Pin.$suggestSolution = "boosterpack2.32";
+ADC1.adc.$suggestSolution                           = "ADC1";
+ADCBuf1.timer.$suggestSolution                      = "Timer1";
+ADCBuf1.adc.$suggestSolution                        = "ADC0";
+ADCBuf1.sequencer0.dmaChannel.$suggestSolution      = "UDMA_CH14";
+ADCBuf1.sequencer0.channel0.adcPin.$suggestSolution = "boosterpack.26";
+GPIO1.gpioPin.$suggestSolution                      = "expansion.87";
+GPIO2.gpioPin.$suggestSolution                      = "expansion.85";
+GPIO3.gpioPin.$suggestSolution                      = "expansion.64";
+GPIO4.gpioPin.$suggestSolution                      = "expansion.66";
+GPIO5.gpioPin.$suggestSolution                      = "expansion.82";
+GPIO6.gpioPin.$suggestSolution                      = "expansion.84";
+RTOS.timer0.resource.$suggestSolution               = "Timer0";
+SPI1.spi.dmaTxChannel.$suggestSolution              = "UDMA_CH15";
+Timer1.timer.$suggestSolution                       = "Timer3";
+Timer2.timer.$suggestSolution                       = "Timer2";
+UART1.uart.$suggestSolution                         = "UART0";
+UART1.uart.txPin.$suggestSolution                   = "expansion.76";
+UART1.uart.rxPin.$suggestSolution                   = "expansion.74";
+UART2.uart.txPin.$suggestSolution                   = "boosterpack.4";
+UART2.uart.rxPin.$suggestSolution                   = "boosterpack.3";
+NIMU1.emac.emac.$suggestSolution                    = "ETHERNET0";
+NIMU1.emac.emac.led0Pin.$suggestSolution            = "boosterpack2.39";
+NIMU1.emac.emac.led1Pin.$suggestSolution            = "boosterpack2.32";

@@ -76,9 +76,15 @@ main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.
 main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdio.h
 main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h
 main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h
+main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/math.h
+main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/_defs.h
+main_tirtos.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_limits.h
 main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/UART.h
 main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/GPIO.h
 main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/Timer.h
+main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/SPI.h
+main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/ADCBuf.h
+main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/ADC.h
 main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/kernel/tirtos/packages/ti/sysbios/BIOS.h
 main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/kernel/tirtos/packages/ti/sysbios/knl/Semaphore.h
 main_tirtos.obj: /home/steve0gillet/ti/ccs1200/xdctools_3_62_01_16_core/packages/xdc/runtime/Types.h
@@ -335,11 +341,23 @@ main_tirtos.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source
 
 /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h:
 
+/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/math.h:
+
+/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/_defs.h:
+
+/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_limits.h:
+
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/UART.h:
 
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/GPIO.h:
 
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/Timer.h:
+
+/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/SPI.h:
+
+/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/ADCBuf.h:
+
+/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/ADC.h:
 
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/kernel/tirtos/packages/ti/sysbios/BIOS.h:
 

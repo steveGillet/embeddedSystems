@@ -19,6 +19,12 @@ extern const ti_sysbios_knl_Semaphore_Handle semaphore0;
 #include <ti/sysbios/knl/Task.h>
 extern const ti_sysbios_knl_Task_Handle task1;
 
+#include <ti/sysbios/knl/Task.h>
+extern const ti_sysbios_knl_Task_Handle task2;
+
+#include <ti/sysbios/knl/Semaphore.h>
+extern const ti_sysbios_knl_Semaphore_Handle semaphore1;
+
 #include <ti/sysbios/gates/GateMutex.h>
 extern const ti_sysbios_gates_GateMutex_Handle tiposix_mqGate;
 

@@ -12,6 +12,8 @@ SYSCFG_SRCS += \
 C_SRCS += \
 ../infrastructure.c \
 ../main_tirtos.c \
+../sineLookup.c \
+../uart7echo.c \
 ../uartecho.c \
 ../udpEcho.c \
 ../udpEchoHooks.c \
@@ -30,6 +32,8 @@ GEN_MISC_DIRS += \
 C_DEPS += \
 ./infrastructure.d \
 ./main_tirtos.d \
+./sineLookup.d \
+./uart7echo.d \
 ./uartecho.d \
 ./udpEcho.d \
 ./udpEchoHooks.d \
@@ -40,6 +44,8 @@ C_DEPS += \
 OBJS += \
 ./infrastructure.obj \
 ./main_tirtos.obj \
+./sineLookup.obj \
+./uart7echo.obj \
 ./uartecho.obj \
 ./udpEcho.obj \
 ./udpEchoHooks.obj \
@@ -58,6 +64,8 @@ GEN_MISC_DIRS__QUOTED += \
 OBJS__QUOTED += \
 "infrastructure.obj" \
 "main_tirtos.obj" \
+"sineLookup.obj" \
+"uart7echo.obj" \
 "uartecho.obj" \
 "udpEcho.obj" \
 "udpEchoHooks.obj" \
@@ -73,6 +81,8 @@ GEN_MISC_FILES__QUOTED += \
 C_DEPS__QUOTED += \
 "infrastructure.d" \
 "main_tirtos.d" \
+"sineLookup.d" \
+"uart7echo.d" \
 "uartecho.d" \
 "udpEcho.d" \
 "udpEchoHooks.d" \
@@ -88,6 +98,8 @@ GEN_FILES__QUOTED += \
 C_SRCS__QUOTED += \
 "../infrastructure.c" \
 "../main_tirtos.c" \
+"../sineLookup.c" \
+"../uart7echo.c" \
 "../uartecho.c" \
 "../udpEcho.c" \
 "../udpEchoHooks.c" \

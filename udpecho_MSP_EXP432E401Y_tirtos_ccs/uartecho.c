@@ -10,8 +10,10 @@
 void *taskUartEcho(void *arg0)
 {
     int indexCommand = 0;
-    UART_write(Glo.uart, Glo.var.echoPrompt, strlen(Glo.var.echoPrompt));
 
+    UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
+    UART_write(Glo.uart, Glo.var.echoPrompt, strlen(Glo.var.echoPrompt));
+    UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
     /* Loop forever echoing */
     while (1) {
         Glo.var.arrowInput[0] = 0;

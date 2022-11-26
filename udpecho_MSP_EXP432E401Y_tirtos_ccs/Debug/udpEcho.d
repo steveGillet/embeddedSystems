@@ -19,10 +19,16 @@ udpEcho.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.
 udpEcho.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdarg.h
 udpEcho.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h
 udpEcho.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h
+udpEcho.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/math.h
+udpEcho.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/_defs.h
+udpEcho.obj: /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_limits.h
 udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/UART.h
 udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/GPIO.h
 udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/Board.h
 udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/Timer.h
+udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/SPI.h
+udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/ADCBuf.h
+udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/ADC.h
 udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/kernel/tirtos/packages/ti/sysbios/BIOS.h
 udpEcho.obj: /home/steve0gillet/ti/ccs1200/xdctools_3_62_01_16_core/packages/xdc/std.h
 udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/kernel/tirtos/packages/ti/targets/arm/elf/std.h
@@ -245,6 +251,12 @@ udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/
 
 /home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h:
 
+/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/math.h:
+
+/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/_defs.h:
+
+/home/steve0gillet/ti/ccs1200/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/machine/_limits.h:
+
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/UART.h:
 
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/GPIO.h:
@@ -252,6 +264,12 @@ udpEcho.obj: /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/Board.h:
 
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/Timer.h:
+
+/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/SPI.h:
+
+/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/ADCBuf.h:
+
+/home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/source/ti/drivers/ADC.h:
 
 /home/steve0gillet/ti/simplelink_msp432e4_sdk_4_20_00_12/kernel/tirtos/packages/ti/sysbios/BIOS.h:
 

@@ -10,6 +10,8 @@ GEN_CMDS__FLAG := -l"/home/steve0gillet/workspace_v12/tirtos_builds_MSP_EXP432E4
 ORDERED_OBJS += \
 "./infrastructure.obj" \
 "./main_tirtos.obj" \
+"./sineLookup.obj" \
+"./uart7echo.obj" \
 "./uartecho.obj" \
 "./udpEcho.obj" \
 "./udpEchoHooks.obj" \
@@ -186,8 +188,8 @@ udpecho_MSP_EXP432E401Y_tirtos_ccs.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "infrastructure.obj" "main_tirtos.obj" "uartecho.obj" "udpEcho.obj" "udpEchoHooks.obj" "syscfg/ti_net_config.obj" "syscfg/ti_ndk_config.obj" "syscfg/ti_drivers_config.obj" 
-	-$(RM) "infrastructure.d" "main_tirtos.d" "uartecho.d" "udpEcho.d" "udpEchoHooks.d" "syscfg/ti_net_config.d" "syscfg/ti_ndk_config.d" "syscfg/ti_drivers_config.d" 
+	-$(RM) "infrastructure.obj" "main_tirtos.obj" "sineLookup.obj" "uart7echo.obj" "uartecho.obj" "udpEcho.obj" "udpEchoHooks.obj" "syscfg/ti_net_config.obj" "syscfg/ti_ndk_config.obj" "syscfg/ti_drivers_config.obj" 
+	-$(RM) "infrastructure.d" "main_tirtos.d" "sineLookup.d" "uart7echo.d" "uartecho.d" "udpEcho.d" "udpEchoHooks.d" "syscfg/ti_net_config.d" "syscfg/ti_ndk_config.d" "syscfg/ti_drivers_config.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'
 	-@echo ' '

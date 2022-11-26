@@ -10,8 +10,11 @@
 
 #define TICKERNUM   16
 #define REGISTERNUM 32
-#define SCRIPTNUM 32
-#define QUELEN 16
+#define SCRIPTNUM   32
+#define QUELEN      16
+#define MESSAGELEN 128
+#define ADCBUFLEN   12
+#define VOICELEN   256
 
 #include <stddef.h>
 #include <string.h>
@@ -19,11 +22,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include <ti/drivers/UART.h>
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/Board.h>
 #include <ti/drivers/Timer.h>
+#include <ti/drivers/SPI.h>
+#include <ti/drivers/ADCBuf.h>
+#include <ti/drivers/ADC.h>
 
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Semaphore.h>
@@ -49,18 +56,33 @@ typedef struct variables{
     const char *helpRegOutput;
     const char *helpScriptOutput;
     const char *helpIfOutput;
+    const char *helpUartOutput;
+    const char *helpSineOutput;
+    const char *helpNetudpOutput;
+    const char *helpAudioOutput;
 
     const char *help;
     const char *about;
     char *command;
     char *previousCommand;
     char *callbackCommand;
+    char *uart7readBuffer;
     int i;
     char *arrowInput;
     // overflow, incorrect command, invalid mem address
     int errorCount[3];
     int overflowFlag;
 } Variables;
+
+typedef struct _sine{
+    SPI_Handle spi;
+    uint16_t *sineVal;
+    SPI_Transaction spiTransaction;
+    double sineIndex;
+    double indexJump;
+    double remainder;
+    uint16_t outVal;
+} Sine;
 
 typedef struct _callbacks{
     char payload[128];
@@ -89,10 +111,31 @@ typedef struct _script{
     char payload[128];
 } Script;
 
+typedef struct _udp{
+    char ip[128];
+    char port[128];
+    char payload[128];
+    Semaphore_Handle sem;
+} UDP;
+
+typedef struct _adc{
+    ADCBuf_Handle bufferHandle;
+    ADC_Handle handle;
+    bool audioOn;
+} ADC;
+
+typedef struct _voice{
+    uint16_t *buffer;
+    int_fast16_t index;
+    bool voiceIn;
+    bool voiceOut;
+} Voice;
+
 typedef struct _globals {
     Timer_Handle timer0;
     Timer_Handle timer1;
     UART_Handle uart;
+    UART_Handle uart7;
     Variables var;
     MessageQueue msgQue;
     Callback callback[3];
@@ -100,6 +143,10 @@ typedef struct _globals {
     Semaphore_Handle msgQueSem;
     int32_t reg[REGISTERNUM];
     Script script[SCRIPTNUM];
+    Sine sine;
+    UDP udp;
+    ADC adc;
+    Voice voice;
 } Globals;
 
 #ifndef MAIN
@@ -121,5 +168,10 @@ void rightButtonCallback(void);
 char *secondString(char *fullString);
 void stringCopy(char *outString, const char *copiedString);
 void taskCommandServicer(void);
+
+void *udpReceive(void *);
+void *udpSend(void *);
+
+void audioFoo(uint16_t convBuffer);
 
 #endif /* MAINHEAD_H_ */

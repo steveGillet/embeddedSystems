@@ -34,6 +34,31 @@ extern "C" {
 
 
 /*
+ *  ======== ADC ========
+ */
+
+/* PD5 */
+extern const uint_least8_t          CONFIG_ADC_0_CONST;
+#define CONFIG_ADC_0                0
+
+
+/*
+ *  ======== ADCBuf ========
+ */
+
+extern const uint_least8_t          CONFIG_ADCBUF_0_CONST;
+#define CONFIG_ADCBUF_0             0
+
+/*
+ * ======== ADCBuf Channels ========
+ */
+
+/* PE3 */
+extern const uint_least8_t          ADCBUF_CHANNEL_0_CONST;
+#define ADCBUF_CHANNEL_0            0
+
+
+/*
  *  ======== GPIO ========
  */
 
@@ -71,6 +96,20 @@ extern const uint_least8_t          CONFIG_GPIO_7_CONST;
 
 
 /*
+ *  ======== SPI ========
+ */
+
+/*
+ *  MOSI: PQ2
+ *  MISO: Unassigned
+ *  SCLK: PQ0
+ *  SS: PQ1
+ */
+extern const uint_least8_t          CONFIG_SPI_0_CONST;
+#define CONFIG_SPI_0                0
+
+
+/*
  *  ======== Timer ========
  */
 
@@ -90,6 +129,12 @@ extern const uint_least8_t          CONFIG_TIMER_1_CONST;
  */
 extern const uint_least8_t          CONFIG_UART_0_CONST;
 #define CONFIG_UART_0               0
+/*
+ *  TX: PC5
+ *  RX: PC4
+ */
+extern const uint_least8_t          CONFIG_UART_7_CONST;
+#define CONFIG_UART_7               1
 
 
 /*

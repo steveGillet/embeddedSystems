@@ -58,10 +58,9 @@ extern void *TaskSelf();
  *  Echoes UDP messages.
  *
  */
-void *echoFxn(void *arg0)
+void *udpReceive(void *arg0)
 {
     int                bytesRcvd;
-    int                bytesSent;
     int                status;
     int                server = -1;
     fd_set             readSet;
@@ -132,15 +131,10 @@ void *echoFxn(void *arg0)
             if (FD_ISSET(server, &readSet)) {
                 bytesRcvd = recvfrom(server, buffer, UDPPACKETSIZE, 0,
                         (struct sockaddr *)&clientAddr, &addrlen);
-
-                if (bytesRcvd > 0) {
-                    bytesSent = sendto(server, buffer, bytesRcvd, 0,
-                            (struct sockaddr *)&clientAddr, addrlen);
-                    if (bytesSent < 0 || bytesSent != bytesRcvd) {
-                        UART_write(Glo.uart, "\r\nError: sendto failed.\r\n", strlen("\r\nError: sendto failed.\r\n"));
-                        goto shutdown;
-                    }
-                }
+                // 0 end of string
+                UART_write(Glo.uart, buffer, strlen(buffer));
+                addMessage(buffer);
+                Semaphore_post(Glo.msgQueSem);
             }
         }
     } while (status > 0);
@@ -158,3 +152,103 @@ shutdown:
 
     return (NULL);
 }
+
+void *udpSend(void *arg0)
+{
+    int                bytesSent;
+    int                status;
+    int                server = -1;
+    fd_set             readSet;
+    struct addrinfo    hints;
+    struct addrinfo    *res, *p;
+    struct sockaddr_in clientAddr;
+    socklen_t          addrlen;
+    char               portNumber[MAXPORTLEN];
+
+    fdOpenSession(TaskSelf());
+
+    UART_write(Glo.uart, "\r\nUDP Echo example starter\r\n", strlen("\r\nUDP Echo example started\r\n"));
+
+    sprintf(portNumber, "%d", *(uint16_t *)arg0);
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family   = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags    = AI_PASSIVE;
+
+    /* Obtain addresses suitable for binding to */
+    status = getaddrinfo(NULL, portNumber, &hints, &res);
+    if (status != 0) {
+        char gaiErrorBuffer[50];
+        sprintf(gaiErrorBuffer, "\r\nError: getaddrinfo() failed: %s\r\n", gai_strerror(status));
+        UART_write(Glo.uart, gaiErrorBuffer, strlen(gaiErrorBuffer));
+        goto shutdown;
+    }
+
+    for (p = res; p != NULL; p = p->ai_next) {
+        server = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        if (server == -1) {
+            continue;
+        }
+
+        //status = bind(server, p->ai_addr, p->ai_addrlen);
+        //if (status != -1) {
+        //    break;
+        //}
+
+//        close(server);
+    }
+
+    if (server == -1) {
+        UART_write(Glo.uart, "\r\nError: socket not created.\r\n", strlen("\r\nError: socket not created.\r\n"));
+        goto shutdown;
+    }
+    else {
+        freeaddrinfo(res);
+        res = NULL;
+    }
+
+//    status = 1;
+
+    while(1){
+        /*
+         *  readSet and addrlen are value-result arguments, which must be reset
+         *  in between each select() and recvfrom() call
+         */
+
+//        FD_ZERO(&readSet);
+//        FD_SET(server, &readSet);
+        addrlen = sizeof(clientAddr);
+
+        Semaphore_pend(Glo.udp.sem, BIOS_WAIT_FOREVER);
+
+        clientAddr.sin_family = AF_INET;
+        clientAddr.sin_port = htons(atoi(Glo.udp.port));
+        clientAddr.sin_addr.s_addr = inet_addr(Glo.udp.ip);
+
+        /* Wait forever for the reply */
+//        status = select(server + 1, &readSet, NULL, NULL, NULL);
+//        status = 1;
+//        if (status > 0) {
+            bytesSent = sendto(server, Glo.udp.payload, strlen(Glo.udp.payload), 0, (struct sockaddr *)&clientAddr, addrlen);
+            if (bytesSent < 0 || bytesSent != strlen(Glo.udp.payload)) {
+                UART_write(Glo.uart, "\r\nError: sendto failed.\r\n", strlen("\r\nError: sendto failed.\r\n"));
+                goto shutdown;
+//            }
+        };
+    };
+
+shutdown:
+    if (res) {
+        freeaddrinfo(res);
+    }
+
+    if (server != -1) {
+        close(server);
+    }
+
+    fdCloseSession(TaskSelf());
+
+    return (NULL);
+}
+//send doesnt bind, pend on sem, pthread udphook

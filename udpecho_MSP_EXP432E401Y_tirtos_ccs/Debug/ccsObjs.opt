@@ -1,5 +1,7 @@
 "./infrastructure.obj"
 "./main_tirtos.obj"
+"./sineLookup.obj"
+"./uart7echo.obj"
 "./uartecho.obj"
 "./udpEcho.obj"
 "./udpEchoHooks.obj"
