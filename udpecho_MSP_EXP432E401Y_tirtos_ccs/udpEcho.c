@@ -132,9 +132,15 @@ void *udpReceive(void *arg0)
                 bytesRcvd = recvfrom(server, buffer, UDPPACKETSIZE, 0,
                         (struct sockaddr *)&clientAddr, &addrlen);
                 // 0 end of string
-                UART_write(Glo.uart, buffer, strlen(buffer));
-                addMessage(buffer);
-                Semaphore_post(Glo.msgQueSem);
+                if(bytesRcvd > 0)
+                {
+                    char msgBuf[MESSAGELEN];
+                    stringCopy(msgBuf, buffer);
+                    msgBuf[bytesRcvd] = 0;
+                    if(!commandTest("-voice", buffer)) UART_write(Glo.uart, msgBuf, strlen(msgBuf));
+                    addMessage(msgBuf);
+                    Semaphore_post(Glo.msgQueSem);
+                }
             }
         }
     } while (status > 0);
@@ -158,7 +164,6 @@ void *udpSend(void *arg0)
     int                bytesSent;
     int                status;
     int                server = -1;
-    fd_set             readSet;
     struct addrinfo    hints;
     struct addrinfo    *res, *p;
     struct sockaddr_in clientAddr;
@@ -226,16 +231,21 @@ void *udpSend(void *arg0)
         clientAddr.sin_port = htons(atoi(Glo.udp.port));
         clientAddr.sin_addr.s_addr = inet_addr(Glo.udp.ip);
 
-        /* Wait forever for the reply */
-//        status = select(server + 1, &readSet, NULL, NULL, NULL);
-//        status = 1;
-//        if (status > 0) {
-            bytesSent = sendto(server, Glo.udp.payload, strlen(Glo.udp.payload), 0, (struct sockaddr *)&clientAddr, addrlen);
-            if (bytesSent < 0 || bytesSent != strlen(Glo.udp.payload)) {
-                UART_write(Glo.uart, "\r\nError: sendto failed.\r\n", strlen("\r\nError: sendto failed.\r\n"));
-                goto shutdown;
-//            }
-        };
+        //len = strlen + 1 for 0 +256
+        int len = 0;
+        len = strlen(Glo.udp.payload);
+        if(commandTest("-voice", Glo.udp.payload)) len += 257;
+
+        bytesSent = sendto(server, Glo.udp.payload, len, 0, (struct sockaddr *)&clientAddr, addrlen);
+        if (bytesSent < 0) {
+            addMessage("-print message send failed");
+            Semaphore_post(Glo.msgQueSem);
+            goto shutdown;
+        }
+        else {
+            addMessage("-print message sent");
+            Semaphore_post(Glo.msgQueSem);
+        }
     };
 
 shutdown:
@@ -251,4 +261,3 @@ shutdown:
 
     return (NULL);
 }
-//send doesnt bind, pend on sem, pthread udphook

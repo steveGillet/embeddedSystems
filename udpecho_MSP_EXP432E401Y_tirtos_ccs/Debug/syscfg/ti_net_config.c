@@ -39,7 +39,7 @@ int32_t ti_net_SlNet_initConfig() {
     if (status == 0) {
         status = SlNetIf_add(SLNETIF_ID_2, "eth0",
                 (const SlNetIf_Config_t *)&SlNetIfConfigNDK,
-                5);
+                1);
     }
 
     return (status);

@@ -185,7 +185,7 @@ static void ndkStackThread(uintptr_t arg0, uintptr_t arg1)
 
     /* user begin hook == null */
 
-    rc = NC_SystemOpen(NC_PRIORITY_LOW, NC_OPMODE_INTERRUPT);
+    rc = NC_SystemOpen(NC_PRIORITY_HIGH, NC_OPMODE_INTERRUPT);
     if (rc) {
         /* ndkStackThread: NC_SystemOpen Failed */
         goto nc_fail;

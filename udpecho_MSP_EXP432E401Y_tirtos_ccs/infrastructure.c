@@ -7,7 +7,7 @@
 
 #include <mainHead.h>
 
-char aboutOutput[128] = "";
+char aboutOutput[MESSAGELEN] = "";
 int timerCallbackCount = 0;
 int leftButtonCallbackCount = 0;
 int rightButtonCallbackCount = 0;
@@ -148,9 +148,9 @@ const char helpAudioOutput[]    = "\r\n-audio turns on the mic and starts playin
 
 const char help[] = "-help";
 const char about[] = "-about";
-char command[128] = "";
-char previousCommand[128] = "";
-char callbackCommand[128] = "";
+char command[MESSAGELEN] = "";
+char previousCommand[MESSAGELEN] = "";
+char callbackCommand[MESSAGELEN] = "";
 int i = 0;
 char arrowInput[2] = "";
 // overflow, incorrect command, invalid mem address
@@ -231,8 +231,8 @@ void commandEntry(char *command) {
         char *memoryBuffer;
         long memoryAddress = 0;
         long memoryContents = 0;
-        char memoryString[128] = "";
-        char memoryAddressString[128] = "";
+        char memoryString[MESSAGELEN] = "";
+        char memoryAddressString[MESSAGELEN] = "";
         char *ptr;
 
         memoryBuffer = secondString(command);
@@ -292,11 +292,11 @@ void commandEntry(char *command) {
         }
     }
     else if(commandTest("-error", command)) {
-        char errorBufferOverflow[128] = "";
+        char errorBufferOverflow[MESSAGELEN] = "";
         sprintf(errorBufferOverflow,         "Overflow:          %2d", errorCount[0]);
-        char errorBufferIncorrectCommand[128] = "";
+        char errorBufferIncorrectCommand[MESSAGELEN] = "";
         sprintf(errorBufferIncorrectCommand, "Incorrect Command: %2d", errorCount[1]);
-        char errorBufferInvalidMemory[128] = "";
+        char errorBufferInvalidMemory[MESSAGELEN] = "";
         sprintf(errorBufferInvalidMemory,    "Invalid Memory:    %2d", errorCount[2]);
         UART_write(Glo.uart, Glo.var.newLine, strlen(Glo.var.newLine));
         UART_write(Glo.uart, errorBufferOverflow, strlen(errorBufferOverflow));
@@ -637,6 +637,23 @@ void commandEntry(char *command) {
         payloadBuffer = secondString(udpBuffer);
 
         if(commandTest("-mic", payloadBuffer)){
+            if(!Glo.voice.voiceOut){
+                addMessage("-gpio 7 -w 1");
+                Semaphore_post(Glo.msgQueSem);
+
+                ADCBuf_Conversion conversion;
+                conversion.adcChannel = ADCBUF_CHANNEL_0;
+                conversion.arg = NULL;
+                conversion.sampleBuffer = Glo.adc.ping;
+                conversion.sampleBufferTwo = Glo.adc.pong;
+                conversion.samplesRequestedCount = VOICELEN;
+                // Start ADCBuf conversion
+                ADCBuf_convert(Glo.adc.bufferHandle, &conversion, 1);
+            }
+            else {
+                addMessage("-gpio 7 -w 0");
+                Semaphore_post(Glo.msgQueSem);
+            }
             Glo.voice.voiceOut = !Glo.voice.voiceOut;
         }
 
@@ -657,8 +674,21 @@ void commandEntry(char *command) {
         Glo.adc.audioOn = !Glo.adc.audioOn;
     }
     else if(commandTest("-voice", command)){
-        Glo.voice.voiceIn = 1;
-        Glo.voice.buffer = &command[7];
+        Glo.voice.pp = atoi(secondString(command));
+        if(!Glo.voice.pp) Glo.voice.ping = (uint16_t *) &command[strlen(command) + 1];
+        else Glo.voice.pong = (uint16_t *) &command[strlen(command) + 1];
+    }
+    else if(commandTest("-stream", command)){
+        if(!Glo.voice.voiceIn){
+            addMessage("-script -x 11");
+            Semaphore_post(Glo.msgQueSem);
+        }
+        else {
+            commandEntry("-callback 0 0");
+            addMessage("-script -x 19");
+            Semaphore_post(Glo.msgQueSem);
+        }
+        Glo.voice.voiceIn = !Glo.voice.voiceIn;
     }
     else {
         errorCount[1]++;
@@ -726,7 +756,7 @@ void infra(void){
     Glo.var.newLine = newLine;
     Glo.msgQue.readIndex = 0;
     Glo.msgQue.writeIndex = 0;
-    Glo.msgQueSem = semaphore0;
+    Glo.msgQueSem = semaphore1;
     Glo.callback[0].payload[0] = 0;
     Glo.callback[1].payload[0] = 0;
     Glo.callback[2].payload[0] = 0;
@@ -757,8 +787,8 @@ void infra(void){
     stringCopy(Glo.script[8].payload, "-callback 0 -1 -sine");
 
     // mic on
-    stringCopy(Glo.script[10].payload, "-gpio 6 -w 0");
-    stringCopy(Glo.script[11].payload, "-gpio 7 -w 1");
+    stringCopy(Glo.script[10].payload, "-gpio 7 -w 1");
+    stringCopy(Glo.script[11].payload, "-gpio 6 -w 0");
     stringCopy(Glo.script[12].payload, "-timer 125");
     stringCopy(Glo.script[13].payload, "-callback 0 -1");
 
@@ -767,8 +797,8 @@ void infra(void){
     stringCopy(Glo.script[16].payload, "-callback 0 0");
 
     // mic off
-    stringCopy(Glo.script[18].payload, "-gpio 6 -w 1");
-    stringCopy(Glo.script[19].payload, "-gpio 7 -w 0");
+    stringCopy(Glo.script[18].payload, "-gpio 7 -w 0");
+    stringCopy(Glo.script[19].payload, "-gpio 6 -w 1");
     stringCopy(Glo.script[20].payload, "-callback 0 0");
 
     Glo.sine.sineVal = sineVal;
@@ -777,13 +807,15 @@ void infra(void){
     Glo.sine.remainder = sineRemainder;
     Glo.sine.outVal = outVal;
 
-    Glo.udp.sem = semaphore1;
+    Glo.udp.sem = semaphore0;
 
     Glo.adc.audioOn = false;
 
     Glo.voice.voiceIn = 0;
     Glo.voice.voiceOut = 0;
     Glo.voice.index = 0;
+
+    Glo.adc.pp = 0;
 }
 
 void initializeDrivers(void){
@@ -903,8 +935,10 @@ void initializeDrivers(void){
     }
     Glo.adc.handle = adcHandle;
 
-    adcBufParams.returnMode = ADCBuf_RETURN_MODE_BLOCKING;
-    adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_ONE_SHOT;
+    adcBufParams.returnMode = ADCBuf_RETURN_MODE_CALLBACK;
+    adcBufParams.recurrenceMode = ADCBuf_RECURRENCE_MODE_CONTINUOUS;
+    adcBufParams.callbackFxn = adcCallback;
+    adcBufParams.samplingFrequency = 8000;
 
     adcBufHandle = ADCBuf_open(0, &adcBufParams);
     Glo.adc.bufferHandle = adcBufHandle;
@@ -943,7 +977,7 @@ char *secondString(char *fullString){
 }
 
 void stringCopy(char *outString, const char *copiedString){
-    for(i = 0; i < 128; i++) if(copiedString[i] == 0) break;
+    for(i = 0; i < MESSAGELEN; i++) if(copiedString[i] == 0) break;
     int j = 0;
     for(j = 0; j < i; j++){
         outString[j] = copiedString[j];
@@ -989,26 +1023,11 @@ void timerCallback(Timer_Handle myHandle, int_fast16_t status)
             audioFoo(convBuffer);
         }
         else if(Glo.voice.voiceIn) {
-            audioFoo(Glo.voice.buffer[Glo.voice.index++]);
+            if(!Glo.voice.pp) audioFoo(Glo.voice.ping[Glo.voice.index++]);
+            else audioFoo(Glo.voice.pong[Glo.voice.index++]);
             if(Glo.voice.index >= VOICELEN){
-                Glo.voice.voiceIn = 0;
                 Glo.voice.index = 0;
             }
-        }
-        else if(Glo.voice.voiceOut) {
-            uint16_t buffer[VOICELEN];
-            char printBuff[] = "-voice ";
-            ADCBuf_Conversion conversion = {0};
-            conversion.samplesRequestedCount = VOICELEN;
-            conversion.sampleBuffer = buffer;
-            conversion.adcChannel = 0;
-            // Start ADCBuf conversion
-            ADCBuf_convert(Glo.adc.bufferHandle, &conversion, 1);
-
-            Glo.udp.payload[0] = *printBuff;
-            Glo.udp.payload[7] = *buffer;
-
-            Semaphore_post(Glo.udp.sem);
         }
         else if(commandTest("-sine", Glo.callback[0].payload)) commandEntry(Glo.callback[0].payload);
         else{
@@ -1019,5 +1038,35 @@ void timerCallback(Timer_Handle myHandle, int_fast16_t status)
             Glo.callback[0].callbackCount--;
         }
     }
+}
+
+void adcCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, void *buffer, uint32_t channel, int_fast16_t status){
+    char printBuff[MESSAGELEN];
+
+    if(Glo.adc.pp == 0){
+        sprintf(printBuff, "-voice 0 128  ");
+        stringCopy(Glo.udp.payload, printBuff);
+        Glo.udp.payload[strlen(printBuff)] = 0;
+        memcpy(&Glo.udp.payload[strlen(printBuff) + 1], Glo.adc.ping, sizeof(uint16_t) * VOICELEN);
+    }
+    else{
+        sprintf(printBuff, "-voice 1 128  ");
+        stringCopy(Glo.udp.payload, printBuff);
+        Glo.udp.payload[strlen(printBuff)] = 0;
+        memcpy(&Glo.udp.payload[strlen(printBuff) + 1], Glo.adc.pong, sizeof(uint16_t) * VOICELEN);
+    }
+
+    Glo.adc.pp = !Glo.adc.pp;
+
+//    if(Glo.voice.voiceOut) {
+//        ADCBuf_Conversion conversion = {0};
+//        conversion.samplesRequestedCount = VOICELEN;
+//        if(Glo.adc.pp == 0) conversion.sampleBuffer = Glo.adc.ping;
+//        else conversion.sampleBuffer = Glo.adc.pong;
+//        conversion.adcChannel = 0;
+//        // Start ADCBuf conversion
+//        ADCBuf_convert(Glo.adc.bufferHandle, &conversion, 1);
+//    }
+    Semaphore_post(Glo.udp.sem);
 }
 

@@ -135,7 +135,7 @@ const ADCBufMSP432E4_HWAttrsV1 adcbufMSP432E4HWAttrs[CONFIG_ADCBUF_COUNT] = {
         .modulePhase = ADCBufMSP432E4_Phase_Delay_0,
         .refSource = ADCBufMSP432E4_VREF_INTERNAL,
         .useDMA = 1,
-        .adcTimerSource = TIMER1_BASE
+        .adcTimerSource = TIMER3_BASE
     },
 };
 
@@ -219,7 +219,7 @@ static uint8_t macAddress[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 const EMACMSP432E4_HWAttrs EMACMSP432E4_hwAttrs = {
     .baseAddr = EMAC0_BASE,
     .intNum = INT_EMAC0,
-    .intPriority = (~0),
+    .intPriority = 0x40,
     .led0Pin = EMACMSP432E4_PK4_EN0LED0,
     .led1Pin = EMACMSP432E4_PK6_EN0LED1,
     .macAddress = macAddress
@@ -404,16 +404,16 @@ TimerMSP432E4_Object timerMSP432E4Objects[CONFIG_TIMER_COUNT];
 const TimerMSP432E4_HWAttrs timerMSP432E4HWAttrs[CONFIG_TIMER_COUNT] = {
     /* CONFIG_TIMER_0 */
     {
-        .baseAddress = TIMER3_BASE,
+        .baseAddress = TIMER2_BASE,
         .subTimer    = TimerMSP432E4_timer32,
-        .intNum      = INT_TIMER3A,
+        .intNum      = INT_TIMER2A,
         .intPriority = 0x20
     },
     /* CONFIG_TIMER_1 */
     {
-        .baseAddress = TIMER2_BASE,
+        .baseAddress = TIMER1_BASE,
         .subTimer    = TimerMSP432E4_timer32,
-        .intNum      = INT_TIMER2A,
+        .intNum      = INT_TIMER1A,
         .intPriority = 0x60
     },
 };

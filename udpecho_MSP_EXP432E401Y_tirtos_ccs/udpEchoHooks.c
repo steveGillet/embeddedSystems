@@ -80,7 +80,7 @@ void netIPAddrHook(uint32_t IPAddr, unsigned int IfIdx, unsigned int fAdd)
 
     /* print the IP address that was added/removed */
     hostByteAddr = NDK_ntohl(IPAddr);
-    char hostByteAddrBuffer[128];
+    char hostByteAddrBuffer[MESSAGELEN];
     sprintf(hostByteAddrBuffer, "\r\nIf-%d:%d.%d.%d.%d\r\n", IfIdx,
             (uint8_t)(hostByteAddr>>24)&0xFF, (uint8_t)(hostByteAddr>>16)&0xFF,
             (uint8_t)(hostByteAddr>>8)&0xFF, (uint8_t)hostByteAddr&0xFF);
@@ -91,7 +91,7 @@ void netIPAddrHook(uint32_t IPAddr, unsigned int IfIdx, unsigned int fAdd)
     status = ti_net_SlNet_initConfig();
     if (status < 0)
     {
-        char statusBuffer[128];
+        char statusBuffer[MESSAGELEN];
         sprintf(statusBuffer, "\r\nFailed to initialize SlNet interface(s)\r\n- status (%d)\r\n", status);
         UART_write(Glo.uart, statusBuffer, strlen(statusBuffer));
 //        while (1);
@@ -148,7 +148,7 @@ void serviceReport(uint32_t item, uint32_t status, uint32_t report, void *h)
     static char *reportStr[] = {"", "Running", "Updated", "Complete", "Fault"};
     static char *statusStr[] =
         {"Disabled", "Waiting", "IPTerm", "Failed","Enabled"};
-    char statusRepBuffer[128];
+    char statusRepBuffer[MESSAGELEN];
 
     sprintf(statusRepBuffer, "\r\nService Status: %-9s: %-9s: %-9s: %03d\r\n",
             taskName[item - 1], statusStr[status], reportStr[report / 256],

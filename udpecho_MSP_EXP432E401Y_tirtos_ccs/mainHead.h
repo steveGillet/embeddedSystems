@@ -12,9 +12,9 @@
 #define REGISTERNUM 32
 #define SCRIPTNUM   32
 #define QUELEN      16
-#define MESSAGELEN 128
+#define MESSAGELEN 320
 #define ADCBUFLEN   12
-#define VOICELEN   256
+#define VOICELEN   128
 
 #include <stddef.h>
 #include <string.h>
@@ -85,20 +85,20 @@ typedef struct _sine{
 } Sine;
 
 typedef struct _callbacks{
-    char payload[128];
+    char payload[MESSAGELEN];
     int callbackCount;
     int period;
 } Callback;
 
 typedef struct _tickers{
-    char payload[128];
+    char payload[MESSAGELEN];
     int tickerCount;
     int delay;
     int period;
 } Ticker;
 
 typedef struct _message{
-    char message[128]; //allocate memory
+    char message[MESSAGELEN]; //allocate memory
 } Message;
 
 typedef struct _messageQueue{
@@ -108,13 +108,13 @@ typedef struct _messageQueue{
 } MessageQueue;
 
 typedef struct _script{
-    char payload[128];
+    char payload[MESSAGELEN];
 } Script;
 
 typedef struct _udp{
-    char ip[128];
-    char port[128];
-    char payload[128];
+    char ip[MESSAGELEN];
+    char port[MESSAGELEN];
+    char payload[MESSAGELEN];
     Semaphore_Handle sem;
 } UDP;
 
@@ -122,6 +122,9 @@ typedef struct _adc{
     ADCBuf_Handle bufferHandle;
     ADC_Handle handle;
     bool audioOn;
+    uint16_t *ping;
+    uint16_t *pong;
+    bool pp;
 } ADC;
 
 typedef struct _voice{
@@ -129,6 +132,9 @@ typedef struct _voice{
     int_fast16_t index;
     bool voiceIn;
     bool voiceOut;
+    uint16_t *ping;
+    uint16_t *pong;
+    bool pp;
 } Voice;
 
 typedef struct _globals {
@@ -157,6 +163,7 @@ Globals Glo;
 void timerCallback(Timer_Handle myHandle, int_fast16_t status);
 void tickerCallback(Timer_Handle myHandle, int_fast16_t status);
 
+void adcCallback(ADCBuf_Handle handle, ADCBuf_Conversion *conversion, void *buffer, uint32_t channel, int_fast16_t status);
 void addMessage(const char *inMessage);
 void commandEntry(char *command);
 int commandTest(const char *command, const char *compareString);

@@ -100,23 +100,26 @@ UART2.$name          = "CONFIG_UART_7";
 UART2.ringBufferSize = 128;
 UART2.uart.$assign   = "UART7";
 
-General.ndkThreadStkSize      = 2048;
-General.lowPriTaskDefStkSize  = 2048;
-General.normPriTaskDefStkSize = 2048;
-General.highPriTaskDefStkSize = 2048;
-General.networkIPAddrHook     = "netIPAddrHook";
-General.tcpTxBufSize          = 1024;
-General.tcpRxBufSize          = 1024;
-General.tcpRxBufLimit         = 2048;
-General.udpRxBufSize          = 2048;
+General.ndkThreadStkSize        = 2048;
+General.lowPriTaskDefStkSize    = 2048;
+General.normPriTaskDefStkSize   = 2048;
+General.highPriTaskDefStkSize   = 2048;
+General.networkIPAddrHook       = "netIPAddrHook";
+General.tcpTxBufSize            = 1024;
+General.tcpRxBufSize            = 1024;
+General.tcpRxBufLimit           = 2048;
+General.udpRxBufSize            = 2048;
+General.netTaskSchedulerTaskPri = "NC_PRIORITY_HIGH";
 
-NIMU1.$name              = "CONFIG_NIMU_0";
-NIMU1.dhcpcServReportFxn = "serviceReport";
-NIMU1.emac.$name         = "CONFIG_EMAC_0";
+NIMU1.$name                  = "CONFIG_NIMU_0";
+NIMU1.dhcpcServReportFxn     = "serviceReport";
+NIMU1.emac.$name             = "CONFIG_EMAC_0";
+NIMU1.emac.interruptPriority = "2";
 
 SlNet1.$name             = "CONFIG_SLNET_0";
 SlNet1.id                = 2;
 SlNet1.enableSecureSocks = false;
+SlNet1.priority          = 1;
 
 /**
  * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
@@ -124,10 +127,10 @@ SlNet1.enableSecureSocks = false;
  * re-solve from scratch.
  */
 ADC1.adc.$suggestSolution                           = "ADC1";
-ADCBuf1.timer.$suggestSolution                      = "Timer1";
+ADCBuf1.timer.$suggestSolution                      = "Timer3";
 ADCBuf1.adc.$suggestSolution                        = "ADC0";
-ADCBuf1.sequencer0.dmaChannel.$suggestSolution      = "UDMA_CH14";
 ADCBuf1.sequencer0.channel0.adcPin.$suggestSolution = "boosterpack.26";
+ADCBuf1.sequencer0.dmaChannel.$suggestSolution      = "UDMA_CH14";
 GPIO1.gpioPin.$suggestSolution                      = "expansion.87";
 GPIO2.gpioPin.$suggestSolution                      = "expansion.85";
 GPIO3.gpioPin.$suggestSolution                      = "expansion.64";
@@ -136,8 +139,8 @@ GPIO5.gpioPin.$suggestSolution                      = "expansion.82";
 GPIO6.gpioPin.$suggestSolution                      = "expansion.84";
 RTOS.timer0.resource.$suggestSolution               = "Timer0";
 SPI1.spi.dmaTxChannel.$suggestSolution              = "UDMA_CH15";
-Timer1.timer.$suggestSolution                       = "Timer3";
-Timer2.timer.$suggestSolution                       = "Timer2";
+Timer1.timer.$suggestSolution                       = "Timer2";
+Timer2.timer.$suggestSolution                       = "Timer1";
 UART1.uart.$suggestSolution                         = "UART0";
 UART1.uart.txPin.$suggestSolution                   = "expansion.76";
 UART1.uart.rxPin.$suggestSolution                   = "expansion.74";
