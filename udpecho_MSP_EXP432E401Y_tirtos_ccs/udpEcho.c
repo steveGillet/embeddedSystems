@@ -135,11 +135,18 @@ void *udpReceive(void *arg0)
                 if(bytesRcvd > 0)
                 {
                     char msgBuf[MESSAGELEN];
-                    stringCopy(msgBuf, buffer);
+                    memcpy(msgBuf, buffer, bytesRcvd);
                     msgBuf[bytesRcvd] = 0;
-                    if(!commandTest("-voice", buffer)) UART_write(Glo.uart, msgBuf, strlen(msgBuf));
-                    addMessage(msgBuf);
-                    Semaphore_post(Glo.msgQueSem);
+                    if(!commandTest("-voice", buffer)){
+                        UART_write(Glo.uart, msgBuf, strlen(msgBuf));
+                        addMessage(msgBuf);
+                        Semaphore_post(Glo.msgQueSem);
+                    }
+                    else {
+                        Glo.voice.pp = atoi(secondString(msgBuf));
+                        if(!Glo.voice.pp) memcpy(Glo.voice.ping, &msgBuf[strlen(msgBuf) + 1], sizeof(uint16_t) * VOICELEN);
+                        else memcpy(Glo.voice.pong, &msgBuf[strlen(msgBuf) + 1], sizeof(uint16_t) * VOICELEN);
+                    }
                 }
             }
         }

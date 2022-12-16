@@ -39,7 +39,7 @@ ADCMSP432E4_Object ADCMSP432E4Objects[CONFIG_ADC_COUNT];
 const ADCMSP432E4_HWAttrsV1 ADCMSP432E4HWAttrs[CONFIG_ADC_COUNT] = {
     /* CONFIG_ADC_0 */
     {
-        .adcPin = ADCMSP432E4_PD_5_A6,
+        .adcPin = ADCMSP432E4_PD_3_A12,
         .refVoltage = ADCMSP432E4_VREF_INTERNAL,
         .adcModule = ADCMSP432E4_MOD1,
         .adcSeq = ADCMSP432E4_SEQ0
@@ -84,7 +84,7 @@ ADCBufMSP432E4_Object adcbufMSP432E4Objects[CONFIG_ADCBUF_COUNT];
 ADCBufMSP432E4_Channels adcBuf0MSP432E4Channels[] = {
     /* ADCBUF_CHANNEL_0 */
     {
-        .adcPin = ADCBufMSP432E4_PE_3_A0,
+        .adcPin = ADCBufMSP432E4_PD_5_A6,
         .adcSequence = ADCBufMSP432E4_Seq_0,
         .adcInputMode = ADCBufMSP432E4_SINGLE_ENDED,
         .adcDifferentialPin = ADCBufMSP432E4_PIN_NONE,

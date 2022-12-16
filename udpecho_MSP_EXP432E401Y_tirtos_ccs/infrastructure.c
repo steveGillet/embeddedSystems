@@ -656,10 +656,10 @@ void commandEntry(char *command) {
             }
             Glo.voice.voiceOut = !Glo.voice.voiceOut;
         }
-
-        stringCopy(Glo.udp.payload, payloadBuffer);
-
-        Semaphore_post(Glo.udp.sem);
+        else{
+            stringCopy(Glo.udp.payload, payloadBuffer);
+            Semaphore_post(Glo.udp.sem);
+        }
     }
     else if(commandTest("-audio", command)){
         if(!Glo.adc.audioOn){
@@ -672,11 +672,6 @@ void commandEntry(char *command) {
             Semaphore_post(Glo.msgQueSem);
         }
         Glo.adc.audioOn = !Glo.adc.audioOn;
-    }
-    else if(commandTest("-voice", command)){
-        Glo.voice.pp = atoi(secondString(command));
-        if(!Glo.voice.pp) Glo.voice.ping = (uint16_t *) &command[strlen(command) + 1];
-        else Glo.voice.pong = (uint16_t *) &command[strlen(command) + 1];
     }
     else if(commandTest("-stream", command)){
         if(!Glo.voice.voiceIn){
@@ -940,7 +935,7 @@ void initializeDrivers(void){
     adcBufParams.callbackFxn = adcCallback;
     adcBufParams.samplingFrequency = 8000;
 
-    adcBufHandle = ADCBuf_open(0, &adcBufParams);
+    adcBufHandle = ADCBuf_open(CONFIG_ADCBUF_0, &adcBufParams);
     Glo.adc.bufferHandle = adcBufHandle;
 }
 

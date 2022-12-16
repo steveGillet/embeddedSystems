@@ -122,8 +122,8 @@ typedef struct _adc{
     ADCBuf_Handle bufferHandle;
     ADC_Handle handle;
     bool audioOn;
-    uint16_t *ping;
-    uint16_t *pong;
+    uint16_t ping[VOICELEN];
+    uint16_t pong[VOICELEN];
     bool pp;
 } ADC;
 
@@ -132,8 +132,8 @@ typedef struct _voice{
     int_fast16_t index;
     bool voiceIn;
     bool voiceOut;
-    uint16_t *ping;
-    uint16_t *pong;
+    uint16_t ping[VOICELEN];
+    uint16_t pong[VOICELEN];
     bool pp;
 } Voice;
 

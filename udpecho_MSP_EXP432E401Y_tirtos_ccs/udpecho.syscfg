@@ -40,12 +40,13 @@ const SlNet1  = SlNet.addInstance();
  * Write custom configuration values to the imported modules.
  */
 ADC1.$name              = "CONFIG_ADC_0";
-ADC1.adc.adcPin.$assign = "expansion.38";
+ADC1.adc.adcPin.$assign = "boosterpack.7";
 
-ADCBuf1.$name                     = "CONFIG_ADCBUF_0";
-ADCBuf1.interruptPriority         = "5";
-ADCBuf1.sequencer0.$name          = "ti_drivers_adcbuf_ADCBufSeqMSP432E40";
-ADCBuf1.sequencer0.channel0.$name = "ADCBUF_CHANNEL_0";
+ADCBuf1.$name                              = "CONFIG_ADCBUF_0";
+ADCBuf1.interruptPriority                  = "5";
+ADCBuf1.sequencer0.$name                   = "ti_drivers_adcbuf_ADCBufSeqMSP432E40";
+ADCBuf1.sequencer0.channel0.$name          = "ADCBUF_CHANNEL_0";
+ADCBuf1.sequencer0.channel0.adcPin.$assign = "expansion.38";
 
 GPIO1.$name     = "CONFIG_GPIO_0";
 GPIO1.$hardware = system.deviceData.board.components.D1;
@@ -126,26 +127,25 @@ SlNet1.priority          = 1;
  * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
  * re-solve from scratch.
  */
-ADC1.adc.$suggestSolution                           = "ADC1";
-ADCBuf1.timer.$suggestSolution                      = "Timer3";
-ADCBuf1.adc.$suggestSolution                        = "ADC0";
-ADCBuf1.sequencer0.channel0.adcPin.$suggestSolution = "boosterpack.26";
-ADCBuf1.sequencer0.dmaChannel.$suggestSolution      = "UDMA_CH14";
-GPIO1.gpioPin.$suggestSolution                      = "expansion.87";
-GPIO2.gpioPin.$suggestSolution                      = "expansion.85";
-GPIO3.gpioPin.$suggestSolution                      = "expansion.64";
-GPIO4.gpioPin.$suggestSolution                      = "expansion.66";
-GPIO5.gpioPin.$suggestSolution                      = "expansion.82";
-GPIO6.gpioPin.$suggestSolution                      = "expansion.84";
-RTOS.timer0.resource.$suggestSolution               = "Timer0";
-SPI1.spi.dmaTxChannel.$suggestSolution              = "UDMA_CH15";
-Timer1.timer.$suggestSolution                       = "Timer2";
-Timer2.timer.$suggestSolution                       = "Timer1";
-UART1.uart.$suggestSolution                         = "UART0";
-UART1.uart.txPin.$suggestSolution                   = "expansion.76";
-UART1.uart.rxPin.$suggestSolution                   = "expansion.74";
-UART2.uart.txPin.$suggestSolution                   = "boosterpack.4";
-UART2.uart.rxPin.$suggestSolution                   = "boosterpack.3";
-NIMU1.emac.emac.$suggestSolution                    = "ETHERNET0";
-NIMU1.emac.emac.led0Pin.$suggestSolution            = "boosterpack2.39";
-NIMU1.emac.emac.led1Pin.$suggestSolution            = "boosterpack2.32";
+ADC1.adc.$suggestSolution                      = "ADC1";
+ADCBuf1.timer.$suggestSolution                 = "Timer3";
+ADCBuf1.adc.$suggestSolution                   = "ADC0";
+ADCBuf1.sequencer0.dmaChannel.$suggestSolution = "UDMA_CH14";
+GPIO1.gpioPin.$suggestSolution                 = "expansion.87";
+GPIO2.gpioPin.$suggestSolution                 = "expansion.85";
+GPIO3.gpioPin.$suggestSolution                 = "expansion.64";
+GPIO4.gpioPin.$suggestSolution                 = "expansion.66";
+GPIO5.gpioPin.$suggestSolution                 = "expansion.82";
+GPIO6.gpioPin.$suggestSolution                 = "expansion.84";
+RTOS.timer0.resource.$suggestSolution          = "Timer0";
+SPI1.spi.dmaTxChannel.$suggestSolution         = "UDMA_CH15";
+Timer1.timer.$suggestSolution                  = "Timer2";
+Timer2.timer.$suggestSolution                  = "Timer1";
+UART1.uart.$suggestSolution                    = "UART0";
+UART1.uart.txPin.$suggestSolution              = "expansion.76";
+UART1.uart.rxPin.$suggestSolution              = "expansion.74";
+UART2.uart.txPin.$suggestSolution              = "boosterpack.4";
+UART2.uart.rxPin.$suggestSolution              = "boosterpack.3";
+NIMU1.emac.emac.$suggestSolution               = "ETHERNET0";
+NIMU1.emac.emac.led0Pin.$suggestSolution       = "boosterpack2.39";
+NIMU1.emac.emac.led1Pin.$suggestSolution       = "boosterpack2.32";
